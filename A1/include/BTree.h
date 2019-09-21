@@ -50,10 +50,14 @@ typedef struct btree
     //the root node of the tree
     BNode root;
     //keep track of number of nodes
-    int numNodes;
+    int numLeaves;
+    int numInternal;
 
     //keeps track of the depth of the tree
     int depth;
+
+    BNode* internal;
+    BNode* leaves;
 }btree;
 
 typedef struct btree* BTree;
@@ -65,6 +69,9 @@ BTree newBTree( int m );
 
 /*Setters */
 void addKey(BTree t, int key);
+void addLeaf(BTree t, BNode n);
+void insert(BTree t, BNode n, int key);
+void split(BTree t, BNode n);
 
 //Data represents the database address of a record
 void addData(BNode n, void* data);
@@ -72,5 +79,12 @@ void addData(BNode n, void* data);
 
 /*Destroyers */
 void delKey(BTree t, int key);
+
+
+
+/*Validators */
+
+bool canKeyBeInserted(BNode n, int k);
+
 
 #endif
