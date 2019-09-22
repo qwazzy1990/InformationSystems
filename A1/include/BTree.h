@@ -25,7 +25,7 @@ struct bnode
     //the array of keys in the node
     int* keys;
     //the array of children in the node
-    struct bnode* children;
+    struct bnode** children;
 
     //if the node is split into two new nodes, then they will have a parent
     struct bnode* parent;
@@ -36,6 +36,8 @@ struct bnode
 
     //set to true if the node is a leaf
     bool isLeaf;
+
+    bool beenAdded;
 
 };
 
@@ -70,9 +72,19 @@ BTree newBTree( int m );
 /*Setters */
 void addKey(BTree t, int key);
 void addLeaf(BTree t, BNode n);
+void addInternal(BTree t, BNode n);
 void insert(BTree t, BNode n, int key);
-void split(BTree t, BNode n);
+void borrow(BTree t, BNode n, int k);
 
+
+BNode findLeafToInsert(BTree t, int k);
+BNode findLeaf(BTree t, int k);
+BNode split(BTree t, BNode n);
+
+
+//For modifying parents
+void addChild(BNode p, BNode child);
+void addParent(BTree t, BNode a, BNode b);
 //Data represents the database address of a record
 void addData(BNode n, void* data);
 
@@ -86,5 +98,10 @@ void delKey(BTree t, int key);
 
 bool canKeyBeInserted(BNode n, int k);
 
+
+/**PRINTERS */
+
+char* printNode(void * data);
+char* printTree(void * data);
 
 #endif

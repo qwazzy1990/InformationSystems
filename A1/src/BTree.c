@@ -32,6 +32,7 @@ BNode newBNode(int m)
     n->parent = NULL;
     n->next = NULL;
     n->isLeaf = true;
+    n->beenAdded = false;
 
     return n;
 }
@@ -58,21 +59,22 @@ void addKey(BTree t, int k)
     if (t->numLeaves == 0)
     {
         t->leaves[0] = newBNode(t->m);
-        t->numLeaves++;
-        t->depth++;
         insert(t, t->leaves[0], k);
         return;
     }
 
     //if can be inerted into a leaf
-    forall(t->numLeaves)
+    BNode n = findLeafToInsert(t, k);
+    if (canKeyBeInserted(n, k))
     {
-        if (canKeyBeInserted(t->leaves[x], k))
-        {
-            insert(t, t->leaves[x], k);
-            return;
-        }
+        insert(t, n, k);
+        return;
     }
+    //try to borrow from a sibling if possible
+    borrow(t, n, n->keys[0]);
+    insert(t, n, k);
+    //addLeaf(t, nn);
+    //addParent(t, n, nn);
     //else you need to split the leaf and possibly internal nodes
     //find where the key should go.
     //split the leaf node.
@@ -82,47 +84,235 @@ void addKey(BTree t, int k)
     //else if there
 }
 
-void addLeaf(BTree t, BNode n)
+void borrow(BTree t, BNode n, int k)
 {
-    t->leaves[t->numLeaves] = n;
-    t->numLeaves++;
+    if(n == NULL || t==NULL)return;
+    BNode parent = n->parent;
+    if(parent == NULL)return;
+    forall(parent->numChilden)
+    {
+        BNode child = parent->children[x];
+        if(canKeyBeInserted(child, k))
+        {
+            child->keys[child->numKeys] = k;
+            child->numKeys++;
+            for(int i = n->numKeys-1; i>0; i--)
+            {
+                n->keys[i-1] = n->keys[i];
+            }
+            n->numKeys--;
+            return;
+        }
+    }
 }
-
 
 void insert(BTree t, BNode n, int k)
 {
     if (canKeyBeInserted(n, k))
     {
+        //add the key
         n->keys[n->numKeys] = k;
         n->numKeys++;
+        //sort the keys
         qsort(n->keys, n->numKeys, sizeof(int), compareInts);
+        //set the root to the new node b/c it will be at lowest depth
+        t->root = n;
+        //if it is a leaf then add it to the leaves
+        if (n->isLeaf)
+        {
+            addLeaf(t, n);
+        }
+        else
+        {
+            addInternal(t, n);
+        }
+
         return;
+    }
+
+    //if the siblings have space, then you don't need to split
+  
+    //split the node n into n and nn
+    BNode nn = split(t, n);
+    //continue the linked list of leaves
+    if (n->isLeaf)
+        n->next = nn;
+    //set nn to the leaf if it is a leaf
+
+    //right bias, add k  to nn
+    insert(t, nn, k);
+    //if n currently does not have a parent node then create a parent node
+    if (n->parent == NULL)
+    {
+        BNode p = newBNode(t->m);
+        p->isLeaf = false;
+        //add to the internal
+        insert(t, p, nn->keys[0]);
+        n->parent = p;
+        nn->parent = p;
+        addChild(p, n);
+        addChild(p, nn);
+    }
+    else
+    {
+        BNode parent = n->parent;
+        insert(t, parent, k);
+        addChild(parent, nn);
+        n->parent = parent;
+        nn->parent = parent;
     }
 }
 
-void split(BTree t, BNode n)
+BNode split(BTree t, BNode n)
 {
     //set the middle element to be ceil(n->numKeys/2)
     //Create a new node which will be the right neighbor of n
-    new_object(BNode, nn, 1);
-    int midIndex = ceil(n->maxKeys/2);
+    BNode nn = newBNode(t->m);
+    int midIndex = ceil(n->maxKeys / 2);
+    int count = 0;
 
     //copy the right skewed, right half, of the keys from n to nn and remove them from n
-    foreach(midIndex, n->maxKeys)
+    foreach (midIndex, n->maxKeys)
     {
-        insert(t, nn, n->keys[x]);
+        nn->keys[count] = n->keys[x];
         //default val
         n->keys[x] = -1;
         //for each key moved from n to nn, reduce the number of keys in n by 1
         n->numKeys--;
+        nn->numKeys++;
+        count++;
     }
+
+    return nn;
     //add the new leaf to the tree
-    addLeaf(t, nn);
 }
 
+
+void addLeaf(BTree t, BNode n)
+{
+    if (n->beenAdded)
+        return;
+    t->leaves[t->numLeaves] = n;
+    t->numLeaves++;
+    n->beenAdded = true;
+}
+
+void addInternal(BTree t, BNode n)
+{
+    if (n->beenAdded)
+        return;
+    t->internal[t->numInternal] = n;
+    t->numInternal++;
+    n->beenAdded = true;
+}
+
+void addChild(BNode p, BNode n)
+{
+    if (p->numChilden < p->maxChildren)
+    {
+        p->children[p->numChilden] = n;
+        p->numChilden++;
+    }
+}
+
+
+
+//Searchers
+BNode findLeaf(BTree t, int k)
+{
+    for (int i = 0; i < t->numLeaves; i++)
+    {
+        BNode n = t->leaves[i];
+        forall(n->numKeys)
+        {
+            if (k == n->keys[x])
+                return n;
+        }
+    }
+    return NULL;
+}
+BNode findLeafToInsert(BTree t, int k)
+{
+    forall(t->numLeaves)
+    {
+        BNode n = t->leaves[x];
+        if (k > n->keys[0] && k < n->keys[n->numKeys - 1])
+            return n;
+    }
+    return t->leaves[t->numLeaves - 1];
+}
+
+//Validators
 bool canKeyBeInserted(BNode n, int k)
 {
     if (n->numKeys < n->maxKeys)
         return true;
     return false;
+}
+
+/**PRINTERS */
+
+char *printNode(void *data)
+{
+    BNode n = (BNode)data;
+    if (n == NULL)
+        return NULL;
+
+    char *s = calloc(1000, sizeof(char));
+    strcpy(s, "\n---BNode---\n");
+    char temp[1000];
+    strcat(s, "Keys: ");
+    forall(n->numKeys)
+    {
+        sprintf(temp, "%d", n->keys[x]);
+        strcat(s, " ");
+        strcat(s, temp);
+    }
+    strcat(s, "\n");
+    if (n->isLeaf)
+    {
+        strcat(s, "Is Leaf\n");
+    }
+    else
+    {
+        strcat(s, "Is not leaf\n");
+    }
+    if (n->parent != NULL)
+    {
+        strcat(s, "Has a parent\n");
+    }
+    else
+    {
+        strcat(s, "Has no parent\n");
+    }
+    return s;
+}
+char *printTree(void *data)
+{
+    BTree t = (BTree)data;
+    if (t == NULL)
+        return NULL;
+    char *s = calloc(1000, sizeof(char));
+    char *temp = NULL;
+    strcat(s, "\n----ROOT----\n");
+    temp = printNode(t->root);
+    strcat(s, temp);
+    free(temp);
+    strcat(s, "\n---LEAVES---\n");
+    forall(t->numLeaves)
+    {
+
+        temp = printNode(t->leaves[x]);
+        s = strcat(s, temp);
+        free(temp);
+    }
+    strcat(s, "\n");
+    strcat(s, "\n---INTERNAL---\n");
+    forall(t->numInternal)
+    {
+        temp = printNode(t->internal[x]);
+        strcat(s, temp);
+        free(temp);
+    }
+    return s;
 }
