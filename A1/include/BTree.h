@@ -74,7 +74,7 @@ void addKey(BTree t, int key);
 void addLeaf(BTree t, BNode n);
 void addInternal(BTree t, BNode n);
 void insert(BTree t, BNode n, int key);
-void borrow(BTree t, BNode n, int k);
+bool borrow(BTree t, BNode n, int k, int pK);
 
 
 BNode findLeafToInsert(BTree t, int k);
@@ -103,5 +103,7 @@ bool canKeyBeInserted(BNode n, int k);
 
 char* printNode(void * data);
 char* printTree(void * data);
+
+void print_tree(BTree t, BNode n);
 
 #endif

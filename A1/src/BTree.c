@@ -71,7 +71,7 @@ void addKey(BTree t, int k)
         return;
     }
     //try to borrow from a sibling if possible
-    borrow(t, n, n->keys[0]);
+   
     insert(t, n, k);
     //addLeaf(t, nn);
     //addParent(t, n, nn);
@@ -84,11 +84,11 @@ void addKey(BTree t, int k)
     //else if there
 }
 
-void borrow(BTree t, BNode n, int k)
+bool borrow(BTree t, BNode n, int k, int pK)
 {
-    if(n == NULL || t==NULL)return;
+    if(n == NULL || t==NULL)return false;
     BNode parent = n->parent;
-    if(parent == NULL)return;
+    if(parent == NULL)return false;
     forall(parent->numChilden)
     {
         BNode child = parent->children[x];
@@ -101,13 +101,23 @@ void borrow(BTree t, BNode n, int k)
                 n->keys[i-1] = n->keys[i];
             }
             n->numKeys--;
-            return;
+            for(int i = 0; i < parent->numKeys; i++)
+            {
+                if(parent->keys[i] == pK)
+                {
+                    parent->keys[i] = k;
+                    break;
+                }
+            }
+            return true;
         }
     }
+    return false;
 }
 
 void insert(BTree t, BNode n, int k)
 {
+    //print_tree(t, t->root);
     if (canKeyBeInserted(n, k))
     {
         //add the key
@@ -116,7 +126,6 @@ void insert(BTree t, BNode n, int k)
         //sort the keys
         qsort(n->keys, n->numKeys, sizeof(int), compareInts);
         //set the root to the new node b/c it will be at lowest depth
-        t->root = n;
         //if it is a leaf then add it to the leaves
         if (n->isLeaf)
         {
@@ -124,6 +133,7 @@ void insert(BTree t, BNode n, int k)
         }
         else
         {
+            t->root = n;
             addInternal(t, n);
         }
 
@@ -134,6 +144,7 @@ void insert(BTree t, BNode n, int k)
   
     //split the node n into n and nn
     BNode nn = split(t, n);
+    nn->isLeaf = n->isLeaf;
     //continue the linked list of leaves
     if (n->isLeaf)
         n->next = nn;
@@ -156,7 +167,7 @@ void insert(BTree t, BNode n, int k)
     else
     {
         BNode parent = n->parent;
-        insert(t, parent, k);
+        insert(t, parent, nn->keys[0]);
         addChild(parent, nn);
         n->parent = parent;
         nn->parent = parent;
@@ -168,7 +179,9 @@ BNode split(BTree t, BNode n)
     //set the middle element to be ceil(n->numKeys/2)
     //Create a new node which will be the right neighbor of n
     BNode nn = newBNode(t->m);
-    int midIndex = ceil(n->maxKeys / 2);
+    float mid = (float)n->maxKeys/2;
+    int midIndex = ceil(mid);
+    //printf("max keys is %d mid index is %d\n", n->maxKeys, midIndex);
     int count = 0;
 
     //copy the right skewed, right half, of the keys from n to nn and remove them from n
@@ -285,7 +298,10 @@ char *printNode(void *data)
     {
         strcat(s, "Has no parent\n");
     }
-    return s;
+    sprintf(temp, "%d", n->numChilden);
+    strcat(s, "Number of children: ");
+    strcat(s, temp);
+        return s;
 }
 char *printTree(void *data)
 {
@@ -315,4 +331,27 @@ char *printTree(void *data)
         free(temp);
     }
     return s;
+}
+
+
+
+void print_tree(BTree t, BNode n)
+{
+    if(n == NULL)return;
+    char* s = NULL;
+    if(n->isLeaf)
+    {
+        s = printNode(n);
+        printf("%s\n", s);
+        free(s);
+        return;
+    }
+    s = printNode(n);
+    printf("%s\n", s);
+    free(s);
+    forall(n->numChilden)
+    {
+        print_tree(t, n->children[x]);
+    }
+
 }

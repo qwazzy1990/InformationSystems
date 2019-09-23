@@ -11,15 +11,19 @@ int main(int argc, char *argv[])
     char* s = NULL;
     if (DEBUG1)
     {
-        BTree t = newBTree(3);
+        BTree t = newBTree(4);
+        addKey(t, 1);
         addKey(t, 4);
         addKey(t, 7);
         addKey(t, 10);
-        //addKey(t, 11);
+        addKey(t, 17);
+        addKey(t, 21);
+        addKey(t, 31);
+        addKey(t, 25);
+        addKey(t, 19);
+        addKey(t, 20);
        
-        s = printTree(t);
-        printf("%s\n", s);
-        free(s);
+        print_tree(t, t->root);
     }
     return 0;
 }
