@@ -23,7 +23,7 @@ struct bnode
     int maxChildren;
 
     //the array of keys in the node
-    int* keys;
+    char** keys;
     //the array of children in the node
     struct bnode** children;
 
@@ -38,6 +38,8 @@ struct bnode
     bool isLeaf;
 
     bool beenAdded;
+
+    bool toBeSplit;
 
 };
 
@@ -54,6 +56,7 @@ typedef struct btree
     //keep track of number of nodes
     int numLeaves;
     int numInternal;
+    int numNodes;
 
     //keeps track of the depth of the tree
     int depth;
@@ -70,17 +73,20 @@ BNode newBNode( int m );
 BTree newBTree( int m );
 
 /*Setters */
-void addKey(BTree t, int key);
+void addKey(BTree t, char* key);
+void add_key(BNode n, char* k);
 void addLeaf(BTree t, BNode n);
 void addInternal(BTree t, BNode n);
-void insert(BTree t, BNode n, int key);
-bool borrow(BTree t, BNode n, int k, int pK);
+BNode insert(BTree t, BNode n, char* k);
 
 
-BNode findLeafToInsert(BTree t, int k);
-BNode findLeaf(BTree t, int k);
-BNode split(BTree t, BNode n);
+BNode findLeafToInsert(BTree t, char* k);
+BNode findLeaf(BTree t, char* k);
+void splitNode(BTree t, BNode n, BNode next);
 
+
+//Iterator
+void sortTree(BTree t, BNode n);
 
 //For modifying parents
 void addChild(BNode p, BNode child);
@@ -90,13 +96,15 @@ void addData(BNode n, void* data);
 
 
 /*Destroyers */
-void delKey(BTree t, int key);
+void delKey(BTree t, char* key);
 
-
+void shiftArray(char** a, int start, int end);
 
 /*Validators */
 
-bool canKeyBeInserted(BNode n, int k);
+bool canKeyBeInserted(BNode n, char* k);
+bool sameNode(BNode n, BNode nn);
+bool shouldAddChild(BTree t, BNode n);
 
 
 /**PRINTERS */
@@ -105,5 +113,9 @@ char* printNode(void * data);
 char* printTree(void * data);
 
 void print_tree(BTree t, BNode n);
+
+
+void deleteTree(BTree t);
+void freeNode(BNode n);
 
 #endif
