@@ -108,6 +108,16 @@ void writeToSortedFile(StringArray a, char* fileName)
     {
         free(blocks[x]);
     }
+    
+    write(fd, &numBlocks, sizeof(int));
+    printf("testing read back\n");
+    int tempTwo;
+
+    close(fd);
+    fd = open(fileName, O_RDONLY);
+    read(fd, &tempTwo, sizeof(int));
+    printf("tempTwo is %d\n", tempTwo);
     free(blocks);
+    freeStringArray(a);
     close(fd);
 }

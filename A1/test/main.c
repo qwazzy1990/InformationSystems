@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
        writeToFile(argv[1], &fd);
        StringArray a = readFromFile("data.txt", &fd);
        writeToSortedFile(a, "sortedData.txt");
-       freeStringArray(a);
     }
     return 0;
 }

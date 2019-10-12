@@ -45,7 +45,6 @@ void packRecords(Block **b, Record *records, int numRecords, int* numBlocks)
 
         b[blockNum]->records[b[blockNum]->numRecords] = records[i];
         b[blockNum]->records[b[blockNum]->numRecords].blockNum = blockNum;
-        printf("%s %s %d\n", b[blockNum]->records[b[blockNum]->numRecords].key, b[blockNum]->records[b[blockNum]->numRecords].value, b[blockNum]->records[b[blockNum]->numRecords].blockNum);
         b[blockNum]->numRecords++;
         if (b[blockNum]->numRecords >= NUM_RECORDS)
         {
