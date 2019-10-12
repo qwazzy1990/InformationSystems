@@ -8,9 +8,16 @@
 #include "DynamicString.h"
 #include "StringArray.h"
 #include "Record.h"
+#include "FileManager.h"
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 bool DEBUG1 = false;
-bool DEBUG2 = true;
+bool DEBUG2 = false;
+bool DEBUG3 = false;
+bool DEBUG4 = true;
 int main(int argc, char *argv[])
 {
     char *s = NULL;
@@ -53,14 +60,39 @@ int main(int argc, char *argv[])
         }
         freeStringArray(a);
         print_tree(t, t->root);
+	printf("Number of leaves %d\n", t->numLeaves);
         deleteTree(t);
-        // Record r;
-        // setRecord(&r, a->strings[1]);
-        // printf("%s|%s\n", r.key, r.value);
-        // freeString(theFile);
-        // freeString(delims);
-        // freeStringArray(a);
-        //String delims = newString();
+       
+    }
+
+    if(DEBUG3)
+    {
+        Record records[10];
+        forall(10)
+        {
+            strcpy(records[x].key, "k1");    
+            strcpy(records[x].value, "val");
+        } 
+
+        Block** blocks = (Block**)calloc(2, sizeof(Block*));
+        forall(2)
+        {
+            
+            blocks[x] = (Block*)newBlock();
+            
+        }
+        int numBlocks = 0;
+        packRecords(blocks, records, 10, &numBlocks);
+        printf("%d\n", numBlocks);
+        
+    }
+    if(DEBUG4)
+    {
+        int fd = 0;
+       writeToFile(argv[1], &fd);
+       StringArray a = readFromFile("data.txt", &fd);
+       writeToSortedFile(a, "sortedData.txt");
+       freeStringArray(a);
     }
     return 0;
 }
