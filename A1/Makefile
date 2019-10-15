@@ -27,7 +27,7 @@ makea1: BIN INCLUDE SRC OBJ TEST LIB
 	$(CC) $(CFLAGS) -lm -Iinclude test/*.c src/*.c -o ./bin/a1
 
 runa1: makea1
-	./bin/a1 test.txt
+	./bin/a1 testTwo.txt
 
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;

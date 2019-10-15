@@ -17,6 +17,7 @@ struct record{
 };
 typedef struct record Record;
 
+
 struct block{
 
     Record records[5];
@@ -29,4 +30,6 @@ void setRecord(Record* r, char* s);
 
 Block* newBlock( void );
 void packRecords(Block** b, Record* r, int numRecords, int* numBlocks);
+
+
 #endif

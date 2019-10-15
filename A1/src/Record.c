@@ -4,6 +4,7 @@
 #include "DynamicString.h"
 #include "StringArray.h"
 #include "utilities.h"
+#include "BTree.h"
 
 
 
@@ -55,3 +56,6 @@ void packRecords(Block **b, Record *records, int numRecords, int* numBlocks)
     }
     *numBlocks = blockNum;
 }
+
+
+

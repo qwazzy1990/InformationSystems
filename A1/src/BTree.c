@@ -69,7 +69,7 @@ BTree newBTree(int m)
     t->numNodes = 0;
 
     t->internal = calloc(10000000, sizeof(BNode));
-    t->leaves = calloc(1000000, sizeof(BNode));
+    t->leaves = calloc(1000, sizeof(BNode));
 
     return t;
 }
@@ -145,6 +145,7 @@ BNode insert(BTree t, BNode n, char *k)
         next->isLeaf = n->isLeaf;
         if (next->isLeaf)
         {
+            addLeaf(t, n);
             n->next = next;
             addLeaf(t, next);
         }
