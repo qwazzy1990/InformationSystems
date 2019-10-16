@@ -32,3 +32,8 @@ runa1: makea1
 
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;
+
+push:
+	git add -A 
+	git commit -m "$(m)"
+	git push
