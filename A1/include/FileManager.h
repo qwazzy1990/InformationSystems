@@ -3,6 +3,7 @@
 #include "StringArray.h"
 #include "Record.h"
 #include "BTree.h"
+#include <stdbool.h>
 
 
 
@@ -18,6 +19,11 @@ void writeBlock(BTree t, int fd, Block* b);
 
 char* findRecord(BTree t, char* key);
 
+bool deleteRecord(BTree t, char* key);
 
 int returnBlockNumber(char* key);
+
+StringArray readBlock(int fd, int offset);
+
+void addRecord(BTree t, char* key, char* value, int* fd);
 #endif

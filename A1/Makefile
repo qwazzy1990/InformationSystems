@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -Wall -g -pedantic
+INPUT=test.txt
 
 all: a1
 
@@ -27,7 +28,7 @@ makea1: BIN INCLUDE SRC OBJ TEST LIB
 	$(CC) $(CFLAGS) -lm -Iinclude test/*.c src/*.c -o ./bin/a1
 
 runa1: makea1
-	./bin/a1 testTwo.txt
+	./bin/a1 $(INPUT)
 
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;

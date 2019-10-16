@@ -47,3 +47,13 @@ void freeStringArray(StringArray a)
     free(a->strings);
     free(a);
 }
+
+
+void addStringArray(StringArray a, char* val)
+{
+    if(a == NULL || val == NULL)return;
+    a->size++;
+    a->strings = realloc(a->strings, a->size*sizeof(char*));
+    a->strings[a->size-1] = calloc(strlen(val)+1, sizeof(char));
+    strcpy(a->strings[a->size-1], val);
+}

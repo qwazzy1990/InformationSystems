@@ -41,6 +41,8 @@ struct bnode
 
     bool toBeSplit;
 
+    bool deleted;
+
 };
 
 
@@ -105,6 +107,7 @@ void shiftArray(char** a, int start, int end);
 bool canKeyBeInserted(BNode n, char* k);
 bool sameNode(BNode n, BNode nn);
 bool shouldAddChild(BTree t, BNode n);
+bool containsKey(BTree t, char* key);
 
 
 /**PRINTERS */
@@ -118,4 +121,7 @@ void print_tree(BTree t, BNode n);
 void deleteTree(BTree t);
 void freeNode(BNode n);
 
+
+//Comparators
+int compareKeys(const void *a, const void *b);
 #endif

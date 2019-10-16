@@ -7,7 +7,7 @@
 #include "utilities.h"
 #include "math.h"
 
-static int compareKeys(const void *a, const void *b)
+int compareKeys(const void *a, const void *b)
 {
     if (a == NULL || b == NULL)
         printf("Whyyyyy\n");
@@ -54,6 +54,7 @@ BNode newBNode(int m)
     n->isLeaf = true;
     n->beenAdded = false;
     n->toBeSplit = false;
+    n->deleted = false;
 
     return n;
 }
@@ -69,7 +70,7 @@ BTree newBTree(int m)
     t->numNodes = 0;
 
     t->internal = calloc(10000000, sizeof(BNode));
-    t->leaves = calloc(1000, sizeof(BNode));
+    t->leaves = calloc(10000000, sizeof(BNode));
 
     return t;
 }
@@ -92,6 +93,7 @@ void add_key(BNode n, char *k)
 
 void addKey(BTree t, char *k)
 {
+    if(containsKey(t, k))return;
     if (t->numNodes == 0)
     {
         t->root = newBNode(t->m);
@@ -341,6 +343,20 @@ bool sameNode(BNode n, BNode nn)
     return false;
 }
 
+bool containsKey(BTree t, char* key)
+{
+    if(t == NULL || key == NULL)return false;
+    forall(t->numLeaves)
+    {
+        BNode n = t->leaves[x];
+        for(int i = 0; i < n->numKeys; i++)
+        {
+            char* k = n->keys[i];
+            if(strcmp(k, key)==0)return true;
+        }
+    }
+    return false;
+}
 
 /**PRINTERS */
 

@@ -15,9 +15,9 @@
 #include <unistd.h>
 
 bool DEBUG1 = false;
-bool DEBUG2 = false;
+bool DEBUG2 = true;
 bool DEBUG3 = false;
-bool DEBUG4 = true;
+bool DEBUG4 = false;
 int main(int argc, char *argv[])
 {
     char *s = NULL;
@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
         String delims = newString();
         addString(delims, "\r\n");
         StringArray a = split(theFile, delims);
+        printf("size is %d\n", a->size);
         freeString(theFile);
         freeString(delims);
 
@@ -92,10 +93,15 @@ int main(int argc, char *argv[])
         int ffd = 0;
         writeToSortedFile(t, a, "sortedData.txt", &ffd);
 
-        ffd = open("sortedData.txt", O_RDONLY);
+        //ffd = open("sortedData.txt", O_RDONLY);
 
-        findRecord(t, "rrwsofsbc");
-        close(ffd);
+        //printf("%s\n", findRecord(t, "rrwsofsbc"));
+        //deleteRecord(t, "rrwsofsbc");
+        //close(ffd);
+        //addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
+        //char* ss = findRecord(t, "bbuqcleji");
+
+       // print_tree(t, t->root);
 
         deleteTree(t);
     }

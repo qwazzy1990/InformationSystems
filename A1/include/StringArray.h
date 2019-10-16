@@ -32,6 +32,8 @@ StringArray split(String s, String delims);
 
 void freeStringArray(StringArray a);
 
+void addStringArray(StringArray a, char* val);
+
 
 
 #endif

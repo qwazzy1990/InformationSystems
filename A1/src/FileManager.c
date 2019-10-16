@@ -76,15 +76,14 @@ StringArray readFromFile(char *fileName, int *fd)
 
 //Write the sorted string array to the file.
 //fileName will be called sortedData.txt
-void writeToSortedFile(BTree t, StringArray a, char *fileName, int* fd)
+void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
 {
     //open the file for writing. This file will bec
     *fd = open(fileName, O_CREAT | O_WRONLY);
 
-
     Record records[a->size];
-    Block **blocks = calloc(a->size / 5 + 100, sizeof(*blocks));
-    forall(a->size / 5 + 100)
+    Block **blocks = calloc(a->size / 5 + 1000000, sizeof(*blocks));
+    forall(a->size / 5 + 1000000)
     {
         blocks[x] = newBlock();
     }
@@ -95,22 +94,20 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int* fd)
     }
     int numBlocks = 0;
 
-    //Pack the records into blocks
-    packRecords(blocks, records, a->size, &numBlocks);
+    // Pack the records into blocks
+     packRecords(blocks, records, a->size, &numBlocks);
 
-   
-    //write each block to the file
-    forall(numBlocks)
-    {
-        writeBlock(t, *fd, blocks[x]);
-    }
+    // write each block to the file
+     forall(numBlocks)
+     {
+         writeBlock(t, *fd, blocks[x]);
+     }
     /**TESTING PURPOSES**/
-    
-    forall(a->size / 5 + 100)
-    {
-        free(blocks[x]);
-    }
 
+     forall(a->size / 5 + 1000000)
+     {
+         free(blocks[x]);
+     }
 
     free(blocks);
     freeStringArray(a);
@@ -145,10 +142,10 @@ void writeRecord(int fd, Record r)
     free(temp);
 }
 
-void writeBlock(BTree t, int fd, Block* b)
+void writeBlock(BTree t, int fd, Block *b)
 {
     //write  the block number
-    write(fd, &(b->blockNumber) ,sizeof(int));
+    write(fd, &(b->blockNumber), sizeof(int));
 
     //for each record in the block
     forall(b->numRecords)
@@ -156,97 +153,122 @@ void writeBlock(BTree t, int fd, Block* b)
         //the temp will be the key added to the tree t.
         //temp contains the key plus its block number.
         //will need to pare the keys in the tree to get its block number
-        char* temp = calloc(strlen(b->records[x].key)+10, 1);
+        char *temp = calloc(strlen(b->records[x].key) + 10, 1);
         strcpy(temp, b->records[x].key);
-        char xx[10];
+        char xx[100];
         //get the block number
         sprintf(xx, "%d", b->records[x].blockNum);
         //concatenate block number to the key in the file
         strcat(temp, xx);
 
+       
+
         //add the file key plus block number as the key in the BTree
         addKey(t, temp);
         //write the record to the file descriptor
         writeRecord(fd, b->records[x]);
-        
+
         free(temp);
     }
 
-    int offset = 1024 - (b->numRecords*(KEY_SIZE+VAL_SIZE)+sizeof(int));
-    new_object(char*, s, offset);
+    int offset = 1024 - (b->numRecords * (KEY_SIZE + VAL_SIZE) + sizeof(int));
+    new_object(char *, s, offset);
     forall(offset)
     {
         s[x] = '|';
     }
     write(fd, s, offset);
     free(s);
-  
 }
 
-
-char* findRecord(BTree t, char* key)
+StringArray readBlock(int fd, int offset)
 {
-    if(t == NULL || key == NULL)return NULL;
+    lseek(fd, offset, SEEK_SET);
+    char temp[10000];
+    read(fd, temp, 1024);
+    String s = newString();
+    addString(s, temp);
+    String delims = newString();
+    addString(delims, "|");
+    StringArray sa = split(s, delims);
+    lseek(fd, 0, SEEK_SET);
+    freeString(s);
+    freeString(delims);
+    return sa;
+}
 
+char *findRecord(BTree t, char *key)
+{
+    if (t == NULL || key == NULL)
+        return NULL;
+
+    char *ret = NULL;
     //Go through all the leaves
     forall(t->numLeaves)
     {
         //get the current leaf
         BNode curNode = t->leaves[x];
-        
+
         //go through all of its keys
-        for(int i = 0; i < curNode->numKeys; i++)
+        for (int i = 0; i < curNode->numKeys; i++)
         {
-            
+
             //start at end of key and go backwards to find the data key without block num
-            int idx = strlen(curNode->keys[i])-1;
-           
+            int idx = strlen(curNode->keys[i]) - 1;
+
             //since all keys are alpha non-numeric, any number will be the block number.
             //Therefore go backwards until you find a non-digit character
-            while(isdigit(curNode->keys[i][idx]))
+            while (isdigit(curNode->keys[i][idx]))
             {
                 idx--;
             }
             idx++;
-            
+
             //if key equals the curNode's key minus the block number then you found the key.
-            if(strncmp(key, curNode->keys[i], idx)==0)
+            if (strncmp(key, curNode->keys[i], idx) == 0)
             {
-                
-                printf("%d\n", returnBlockNumber(curNode->keys[i]));
+
                 char temp[10000];
                 int fd = open("sortedData.txt", O_RDONLY);
-                lseek(fd, returnBlockNumber(curNode->keys[i])*1024 + 4, SEEK_SET);
-                read(fd, temp, 1024);
-                printf("%s\n", temp);
-                free(temp);
-            }
-            
-            
-            
+                StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * 1024 + 4);
 
+                //find the correct record
+                forall(a->size)
+                {
+                    if (strcmp(key, a->strings[x]) == 0)
+                    {
+                        ret = calloc(VAL_SIZE, 1);
+                        strcpy(ret, a->strings[x + 1]);
+                        freeStringArray(a);
+                        close(fd);
+                        return ret;
+                    }
+                }
+                freeStringArray(a);
+                close(fd);
+                return ret;
+            }
         }
     }
-    return NULL;
+    return ret;
 }
 
-
-int returnBlockNumber(char* key)
+int returnBlockNumber(char *key)
 {
 
     int idx = 0;
     //keep going through key until block number is found
-    while(isdigit(key[idx])==false)
+    while (isdigit(key[idx]) == false)
     {
         idx++;
     }
 
     //create a temp char*
-    new_object(char*, s, 30);
+    new_object(char *, s, 30);
     int count = 0;
 
     //go from start of block number till end
-    foreach(idx, strlen(key))
+    foreach (idx, strlen(key))
     {
         s[count] = key[x];
         count++;
@@ -256,4 +278,96 @@ int returnBlockNumber(char* key)
     free(s);
 
     return bn;
+}
+
+void addRecord(BTree t, char *key, char *value, int *fd)
+{
+    *fd = open("sortedData.txt", O_RDONLY);
+    lseek(*fd, -1024, SEEK_END);
+
+    //get the number of blocks
+    int numBlocks = 0;
+    read(*fd, &numBlocks, 4);
+    lseek(*fd, 0, SEEK_SET);
+
+  
+
+    //for each block, check to see if the key goes at that block number
+    forall(numBlocks)
+    {
+        StringArray sa = readBlock(*fd, x * 1024 + 4);
+        strcpy(sa->strings[sa->size-1], "");
+        sa->size--;
+        
+        if (strcmp(sa->strings[0], key) <= 0 && (strcmp(sa->strings[sa->size - 2], key) >= 0))
+        {
+            close(*fd);
+            *fd = open("sortedData.txt", O_WRONLY);
+
+            //add the new key and value to the block
+            addStringArray(sa, key);
+            addStringArray(sa, value);
+            Block *b = newBlock();
+            b->blockNumber = x;
+            b->numRecords = sa->size / 2;
+            int count = 0;
+            for (int i = 0; i < sa->size; i += 2)
+            {
+                char temp[1000];
+                strcpy(temp, sa->strings[i]);
+                strcat(temp, " ");
+                strcat(temp, sa->strings[i+1]);
+                Record r;
+                setRecord(&r, temp);
+                r.blockNum = x;
+                b->records[count] = r;
+                count++;
+            }
+            freeStringArray(sa);
+           
+            lseek(*fd, x * 1024, SEEK_SET);
+            writeBlock(t, *fd, b);
+            free(b);
+            //write(*fd, temp, 1024);
+            close(*fd);
+            break;
+        }
+    }
+    close(*fd);
+    return;
+}
+
+bool deleteRecord(BTree t, char *key)
+{
+    forall(t->numLeaves)
+    {
+        BNode n = t->leaves[x];
+        if (n->deleted)
+            continue;
+        for (int k = 0; k < n->numKeys; k++)
+        {
+
+            int idx = strlen(n->keys[k]) - 1;
+            while (isdigit(n->keys[k][idx]))
+            {
+                idx--;
+            }
+            if (strncmp(key, n->keys[k], idx) == 0)
+            {
+                printf("Deleting...\n%s %s\n", key, n->keys[k]);
+
+                strcpy(n->keys[k], "");
+                //n->keys--;
+                if (n->keys == 0)
+                {
+                    n->deleted = true;
+                }
+                sortTree(t, t->root);
+
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
