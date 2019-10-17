@@ -456,3 +456,72 @@ bool deleteRecord(BTree t, char *key)
 
     return false;
 }
+
+
+
+//For Hash Map
+
+void writeRecordHash(char* key, char* value, unsigned long hash)
+{
+    int fd = open("hashData.txt", O_CREAT | O_WRONLY);
+    lseek(fd, 0, SEEK_SET);
+    lseek(fd, hash, SEEK_SET);
+    printf("hash is %ld\n", hash);
+    Record r;
+    char* temp = calloc(150, sizeof(char));
+    strcpy(temp, key);
+    strcat(temp, " ");
+    strcat(temp, value);
+    setRecord(&r, temp);
+    writeRecord(fd, r);
+    free(temp);
+    close(fd);
+}
+
+void readRecordHash( unsigned long hash, Record* r)
+{
+
+    //open the file to read from
+    int fd = open("hashData.txt", O_CREAT | O_RDONLY);
+
+    //create a temp
+    char* temp = calloc(1000, sizeof(char));
+    //seek to the hash value
+    lseek(fd, hash, SEEK_SET);
+    //read it in
+    read(fd, temp, KEY_SIZE + VAL_SIZE);
+
+    //split strings based on the '|' in the file
+    String s = newString();
+    addString(s, temp);
+    String delims = newString();
+    addString(delims, "|");
+    StringArray sa = split(s, delims);
+    free(temp);
+    freeString(delims);
+    freeString(s);
+
+    //copy the key in the file into  the record
+    strcpy((*r).key, sa->strings[0]);
+    //copy the value in the file to the record
+    foreach(1, sa->size)
+    {
+        strcat((*r).value, sa->strings[x]);
+    } 
+    printf("%s %s\n", (*r).key, (*r).value);
+    //close the file
+    close(fd);
+}
+
+void writeToHashFile(HashMap m, StringArray a, char* fileName)
+{
+    int fd = open(fileName, O_CREAT | O_WRONLY);
+    lseek(fd, 0,  SEEK_SET);
+    forall(a->size)
+    {
+        Record r;
+        setRecord(&r, a->strings[x]);
+        put_hashmap(m, r.key, r.value);
+        writeRecordHash(r.key, r.value, hash(m, r.key));
+    }
+}

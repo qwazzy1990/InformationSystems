@@ -22,18 +22,19 @@ bool DEBUG4 = false;
 bool DEBUG5 = false;
 bool DEBUG6 = true;
 
-static char* printInt( void* data)
+static char* printString( void* data)
 {
-    int* temp = (int*)data;
-    char* s = calloc(20, sizeof(char));
-    sprintf(s, "%d", *temp);
+    char* temp = (char*)data;
+    new_object(char*, s, strlen(temp)+1);
+    strcpy(s, temp);
     return s;
 
 }
 
-static void deleteInt( void* data)
+static void deleteString( void* data)
 {
-    return;
+    char* temp = (char*)data;
+    free(temp);
 }
 int main(int argc, char *argv[])
 {
@@ -138,24 +139,17 @@ int main(int argc, char *argv[])
 
     if(DEBUG6)
     {
-        HashMap m = new_hashmap(printInt, deleteInt, 15);
-        int a = 12;
-        int b = 11;
-        char* k1 = calloc(100, sizeof(char));
-        strcpy(k1, "aabbccd");
-        char* k2 = calloc(100, sizeof(char));
-        strcpy(k2, "aabbccd");
-        put_hashmap(m, "aabbccd", &a);
-        put_hashmap(m, "aabbcdsd", &b);
-        char* s = map_to_string(m);
-        printf("%s\n", s);
-        free(k1);
-        free(k2);
+        HashMap m = new_hashmap(printString, deleteString, 4);
+        int k;
+        StringArray sa = readFromFile(argv[1], &k);
+        writeToHashFile(m, sa, "hashData.txt");
+        freeStringArray(sa);
+        Record r;
+        readRecordHash("", &r);
 
 
-        free(s);
-         destroy_hashmap(m);
-
+        destroy_hashmap(m);
+        
         
     }
     return 0;

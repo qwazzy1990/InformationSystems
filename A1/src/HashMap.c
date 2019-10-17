@@ -7,7 +7,7 @@
 /*****ENCAPSULATED FUNCTIONS AND VARIABLES NOT DIRECTLY 
                                                    AVAILABLE TO API USERS*********/
 
-static unsigned long hash(char *str)
+unsigned long hash(HashMap m, char *str)
 {
     int i = 0;
     unsigned long hash = 5381;
@@ -19,6 +19,7 @@ static unsigned long hash(char *str)
         i++;
     }
 
+    hash = hash % m->tableSize;
     return hash;
 }
 
@@ -52,7 +53,7 @@ unsigned long get_data_index(HashMap map, char *key)
 {
     assert(map != NULL);
     assert(map->table != NULL);
-    unsigned long index = hash(key);
+    unsigned long index = hash(map, key);
     assert(index < map->tableSize);
     unsigned long start = index;
     if (map->table[index]->key == NULL)
@@ -203,7 +204,7 @@ ErrorCode put_hashmap(HashMap map, char *key, AnyData value)
         return DNE;
     if (map->size >= map->tableSize)
         return FULL;
-    unsigned long index = hash(key);
+    unsigned long index = hash(map, key);
     index = index % map->tableSize;
     printf("index is %ld\n", index);
 

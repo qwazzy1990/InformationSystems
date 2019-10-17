@@ -3,10 +3,11 @@
 #include "StringArray.h"
 #include "Record.h"
 #include "BTree.h"
+#include "HashMap.h"
 #include <stdbool.h>
 
 
-
+//For BPlus Tree
 void writeToFile(char* fileName, int* fileNumber);
 
 
@@ -30,4 +31,11 @@ int returnBlockNumber(char* key);
 StringArray readBlock(int fd, int offset);
 
 void addRecord(BTree t, char* key, char* value, int* fd);
+
+
+//For HashMap
+
+void writeRecordHash(char* key, char* value, unsigned long hash);
+void readRecordHash(unsigned long hash, Record* r);
+void writeToHashFile(HashMap m, StringArray a, char* fileName);
 #endif
