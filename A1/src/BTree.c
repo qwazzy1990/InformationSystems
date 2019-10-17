@@ -16,10 +16,6 @@ int compareKeys(const void *a, const void *b)
     return strcmp((*f), (*s));
 }
 
-static int getMidIndex(BTree t)
-{
-    return t->m / 2;
-}
 
 static int compareNodes(const void *a, const void *b)
 {
@@ -393,6 +389,13 @@ char *printNode(void *data)
     {
         strcat(s, "Has no parent\n");
     }
+    if(n->beenAdded)
+    {
+        strcat(s, "Been Added\n");
+    }else strcat(s, "Not been added\n");
+    if(n->deleted)strcat(s, "Been Deleted\n");
+    else strcat(s, "Not Been Deleted\n");
+    
     sprintf(temp, "%d", n->numChilden);
     strcat(s, "Number of children: ");
     strcat(s, temp);

@@ -17,6 +17,10 @@ void writeToSortedFile(BTree t, StringArray a, char* fileName, int* fd);
 void writeRecord(int fd, Record r);
 void writeBlock(BTree t, int fd, Block* b);
 
+void writeNode(char* fileName, BNode n, int idx);
+
+BNode readNode(char* fileName, int idx);
+
 char* findRecord(BTree t, char* key);
 
 bool deleteRecord(BTree t, char* key);

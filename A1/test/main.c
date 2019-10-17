@@ -9,18 +9,34 @@
 #include "StringArray.h"
 #include "Record.h"
 #include "FileManager.h"
+#include "HashMap.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 bool DEBUG1 = false;
-bool DEBUG2 = true;
+bool DEBUG2 = false;
 bool DEBUG3 = false;
 bool DEBUG4 = false;
+bool DEBUG5 = false;
+bool DEBUG6 = true;
+
+static char* printInt( void* data)
+{
+    int* temp = (int*)data;
+    char* s = calloc(20, sizeof(char));
+    sprintf(s, "%d", *temp);
+    return s;
+
+}
+
+static void deleteInt( void* data)
+{
+    return;
+}
 int main(int argc, char *argv[])
 {
-    char *s = NULL;
     if (DEBUG1)
     {
         BTree t = newBTree(4);
@@ -93,17 +109,54 @@ int main(int argc, char *argv[])
         int ffd = 0;
         writeToSortedFile(t, a, "sortedData.txt", &ffd);
 
-        //ffd = open("sortedData.txt", O_RDONLY);
+        ffd = open("sortedData.txt", O_RDONLY);
 
-        //printf("%s\n", findRecord(t, "rrwsofsbc"));
-        //deleteRecord(t, "rrwsofsbc");
-        //close(ffd);
-        //addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
-        //char* ss = findRecord(t, "bbuqcleji");
+        //  printf("%s\n", findRecord(t, "rrwsofsbc"));
+        // deleteRecord(t, "rrwsofsbc");
+        //  close(ffd);
+        //  addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
+        //  char* ss = findRecord(t, "bbuqcleji");
+        //  printf("%s\n", ss);
 
-       // print_tree(t, t->root);
+        //print_tree(t, t->root);
 
+        writeNode("tree.txt", t->leaves[0], 0);
         deleteTree(t);
+    }
+    if (DEBUG5)
+    {
+        BNode n = newBNode(8);
+        n->beenAdded = true;
+        n->deleted = false;
+        add_key(n, "aabbcddffg0");
+        add_key(n, "aabbccddffh0");
+        add_key(n, "aabbccddffi0");
+        writeNode("tree.txt", n, 0);
+        readNode("tree.txt", 0);
+        freeNode(n);
+    }
+
+    if(DEBUG6)
+    {
+        HashMap m = new_hashmap(printInt, deleteInt, 15);
+        int a = 12;
+        int b = 11;
+        char* k1 = calloc(100, sizeof(char));
+        strcpy(k1, "aabbccd");
+        char* k2 = calloc(100, sizeof(char));
+        strcpy(k2, "aabbccd");
+        put_hashmap(m, "aabbccd", &a);
+        put_hashmap(m, "aabbcdsd", &b);
+        char* s = map_to_string(m);
+        printf("%s\n", s);
+        free(k1);
+        free(k2);
+
+
+        free(s);
+         destroy_hashmap(m);
+
+        
     }
     return 0;
 }

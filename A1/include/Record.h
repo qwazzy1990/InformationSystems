@@ -20,7 +20,7 @@ typedef struct record Record;
 
 struct block{
 
-    Record records[9];
+    Record records[20];
     int numRecords;
     int blockNumber;
 };typedef struct block Block;

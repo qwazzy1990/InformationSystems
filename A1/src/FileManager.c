@@ -80,10 +80,9 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
 {
     //open the file for writing. This file will bec
     *fd = open(fileName, O_CREAT | O_WRONLY);
-
     Record records[a->size];
-    Block **blocks = calloc(a->size / 5 + 1000000, sizeof(*blocks));
-    forall(a->size / 5 + 1000000)
+    Block **blocks = calloc(a->size / 5 + 1000, sizeof(*blocks));
+    forall(a->size / 5 + 1000)
     {
         blocks[x] = newBlock();
     }
@@ -95,19 +94,19 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
     int numBlocks = 0;
 
     // Pack the records into blocks
-     packRecords(blocks, records, a->size, &numBlocks);
+    packRecords(blocks, records, a->size, &numBlocks);
 
     // write each block to the file
-     forall(numBlocks)
-     {
-         writeBlock(t, *fd, blocks[x]);
-     }
+    forall(numBlocks)
+    {
+        writeBlock(t, *fd, blocks[x]);
+    }
     /**TESTING PURPOSES**/
 
-     forall(a->size / 5 + 1000000)
-     {
-         free(blocks[x]);
-     }
+    forall(a->size / 5 + 1000)
+    {
+        free(blocks[x]);
+    }
 
     free(blocks);
     freeStringArray(a);
@@ -161,8 +160,6 @@ void writeBlock(BTree t, int fd, Block *b)
         //concatenate block number to the key in the file
         strcat(temp, xx);
 
-       
-
         //add the file key plus block number as the key in the BTree
         addKey(t, temp);
         //write the record to the file descriptor
@@ -181,6 +178,92 @@ void writeBlock(BTree t, int fd, Block *b)
     free(s);
 }
 
+//Writes a node to the tree file
+
+void writeNode(char* fileName, BNode n, int idk)
+{
+    int fd = open(fileName, O_CREAT | O_WRONLY);
+
+    lseek(fd, 0, SEEK_SET);
+
+    new_object(char*, s, 400);
+
+    int num;
+
+    //write the node's database address
+    write(fd, &idk, sizeof(int));
+    //write the number of keys
+    write(fd, &(n->numKeys), sizeof(int));
+
+    //write each key
+    forall(n->numKeys)
+    {
+        char* temp = calloc(300, sizeof(char));
+        strcpy(temp, n->keys[x]);
+        write(fd, temp, KEY_SIZE);
+        free(temp);
+    }
+
+    //if the leaf has been added then write 1
+    if(n->beenAdded) num = 1;
+    else num = 0; //else write 0
+    write(fd, &num, sizeof(int));
+
+    //if the leaf has been deleted write 1
+    if(n->deleted) num = 1;
+    else num = 0;//else write 0
+    write(fd, &num, sizeof(int));
+
+    close(fd);
+}
+
+
+BNode readNode(char* fileName, int idx)
+{
+    //open the file
+    int fd = open(fileName, O_CREAT | O_RDONLY);
+    lseek(fd, 0, SEEK_SET);
+
+    //create a node
+    BNode n = newBNode(8);
+    //will be a leaf
+    n->isLeaf = true;
+    //will have no children
+    n->numChilden = 0;
+    //seek 4 from the index to get rid of its db address
+    lseek(fd, 4, idx);
+    int numKeys = 0;
+    read(fd, &(numKeys), sizeof(int));
+    printf("%d\n", numKeys);
+    forall(numKeys)
+    {
+        char* temp = calloc(100, sizeof(char));
+        read(fd, temp, KEY_SIZE);
+        add_key(n, temp);
+        free(temp);
+        printf("%s\n", n->keys[x]);
+    }
+
+    int num = 0;
+    read(fd, &num, sizeof(int));
+    printf("been added is %d\n", num);
+    if(num == 0)n->beenAdded = false;
+    else n->beenAdded = true;
+
+    read(fd, &num, sizeof(int));
+    printf("been deleted is %d\n", num);
+    if(num == 0)n->deleted  = false;
+    else n->deleted = true;
+
+    char* s = printNode(n);
+    printf("%s\n", s);
+    free(s);
+    freeNode(n);
+
+    close(fd);
+    return NULL;
+
+}
 StringArray readBlock(int fd, int offset)
 {
     lseek(fd, offset, SEEK_SET);
@@ -228,7 +311,6 @@ char *findRecord(BTree t, char *key)
             if (strncmp(key, curNode->keys[i], idx) == 0)
             {
 
-                char temp[10000];
                 int fd = open("sortedData.txt", O_RDONLY);
                 StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * 1024 + 4);
 
@@ -283,6 +365,7 @@ int returnBlockNumber(char *key)
 void addRecord(BTree t, char *key, char *value, int *fd)
 {
     *fd = open("sortedData.txt", O_RDONLY);
+    printf("fd is %d\n", *fd);
     lseek(*fd, -1024, SEEK_END);
 
     //get the number of blocks
@@ -290,15 +373,17 @@ void addRecord(BTree t, char *key, char *value, int *fd)
     read(*fd, &numBlocks, 4);
     lseek(*fd, 0, SEEK_SET);
 
-  
-
     //for each block, check to see if the key goes at that block number
     forall(numBlocks)
     {
         StringArray sa = readBlock(*fd, x * 1024 + 4);
-        strcpy(sa->strings[sa->size-1], "");
-        sa->size--;
-        
+        if (sa->size % 2 == 1)
+        {
+            strcpy(sa->strings[sa->size - 1], "");
+            sa->size--;
+        }
+        //printf("sa size is %d\n", sa->size);
+
         if (strcmp(sa->strings[0], key) <= 0 && (strcmp(sa->strings[sa->size - 2], key) >= 0))
         {
             close(*fd);
@@ -316,7 +401,7 @@ void addRecord(BTree t, char *key, char *value, int *fd)
                 char temp[1000];
                 strcpy(temp, sa->strings[i]);
                 strcat(temp, " ");
-                strcat(temp, sa->strings[i+1]);
+                strcat(temp, sa->strings[i + 1]);
                 Record r;
                 setRecord(&r, temp);
                 r.blockNum = x;
@@ -324,7 +409,7 @@ void addRecord(BTree t, char *key, char *value, int *fd)
                 count++;
             }
             freeStringArray(sa);
-           
+
             lseek(*fd, x * 1024, SEEK_SET);
             writeBlock(t, *fd, b);
             free(b);
