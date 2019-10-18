@@ -17,6 +17,7 @@ void setRecord(Record *r, char *s)
         r->key[count] = s[i];
         i++;
         count++;
+        if(i > strlen(s))break;
     }
     r->key[count] = '\0';
     count = 0;
@@ -58,4 +59,15 @@ void packRecords(Block **b, Record *records, int numRecords, int* numBlocks)
 }
 
 
-
+char* printRecord(void * r)
+{
+    Record* rr = (Record*)r;
+    char* temp = calloc(300, sizeof(char));
+    strcat(temp, "RECORD KEY: ");
+    strcat(temp, rr->key);
+    strcat(temp, "\n");
+    strcat(temp, "RECORD VALUES: ");
+    strcat(temp, rr->value);
+    strcat(temp, "\n");
+    return temp;
+}

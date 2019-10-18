@@ -31,5 +31,7 @@ void setRecord(Record* r, char* s);
 Block* newBlock( void );
 void packRecords(Block** b, Record* r, int numRecords, int* numBlocks);
 
+char* printRecord(void * r);
+
 
 #endif

@@ -38,7 +38,7 @@ StringArray readFromFile(char *fileName, int *fd)
 {
     //open the file
     *fd = open(fileName, O_RDONLY, 0);
-     if (*fd == -1)
+    if (*fd == -1)
     {
         printf("File could not be found\n");
 
@@ -93,7 +93,7 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
 {
     //open the file for writing. This file will bec
     *fd = open(fileName, O_CREAT | O_WRONLY);
-     if (*fd == -1)
+    if (*fd == -1)
     {
         printf("File could not be found\n");
 
@@ -202,7 +202,7 @@ void writeBlock(BTree t, int fd, Block *b)
 void writeNode(char *fileName, BNode n, int idk)
 {
     int fd = open(fileName, O_CREAT | O_WRONLY);
-     if (fd == -1)
+    if (fd == -1)
     {
         printf("File could not be found\n");
 
@@ -250,7 +250,7 @@ BNode readNode(char *fileName, int idx)
 {
     //open the file
     int fd = open(fileName, O_CREAT | O_RDONLY);
-     if (fd == -1)
+    if (fd == -1)
     {
         printf("File could not be found\n");
 
@@ -303,7 +303,7 @@ BNode readNode(char *fileName, int idx)
 }
 StringArray readBlock(int fd, int offset)
 {
-     if (fd == -1)
+    if (fd == -1)
     {
         printf("File could not be found\n");
 
@@ -328,7 +328,7 @@ char *findRecord(BTree t, char *key)
     if (t == NULL || key == NULL)
         return NULL;
 
-    char *ret = NULL;
+    char *ret = calloc(1000, sizeof(char));
     //Go through all the leaves
     forall(t->numLeaves)
     {
@@ -349,6 +349,7 @@ char *findRecord(BTree t, char *key)
                 idx--;
             }
             idx++;
+            printf("%s\n", curNode->keys[i]);
 
             //if key equals the curNode's key minus the block number then you found the key.
             if (strncmp(key, curNode->keys[i], idx) == 0)
@@ -356,29 +357,58 @@ char *findRecord(BTree t, char *key)
 
                 int fd = open("sortedData.txt", O_RDONLY);
                 StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * BLOCK_SIZE + 4);
+                if (a->size % 2 == 1)
+                {
+                    a->size--;
+                }
+                strcat(ret, "BLOCK NUMBER: ");
+                char *bn = calloc(10, sizeof(char));
+                sprintf(bn, "%d", returnBlockNumber(curNode->keys[i]));
+                strcat(ret, bn);
+                strcat(ret, "\n");
+                free(bn);
 
                 //find the correct record
-                forall(a->size)
+                for (int x = 0; x < a->size; x += 2)
                 {
-                    if (strcmp(key, a->strings[x]) == 0)
-                     {
-                        ret = calloc(VAL_SIZE, 1);
-                        strcpy(ret, a->strings[x + 1]);
-                        freeStringArray(a);
-                        close(fd);
-                        return ret;
-                    }
-                    // strcat(ret, "Key:");
-                    // strcat(ret, a->strings[x]);
-                    // strcat(ret, "\n");
-                    // strcat(ret, "Val:");
-                    // strcat(ret, a->strings[x+1]);
-                    // strcat(ret, "\n\n");
-                    // x+=2;
 
+                    // if (strcmp(key, a->strings[x]) == 0)
+                    // {
+                    //     ret = calloc(VAL_SIZE, 1);
+                    //     strcpy(ret, a->strings[x + 1]);
+                    //     freeStringArray(a);
+                    //     close(fd);
+                    //     return ret;
+                    // }
+
+                    //for each record in the block
+                    Record r;
+
+                    //get the shit
+                    char *shit = calloc(1000, sizeof(char));
+                    strcat(shit, a->strings[x]);
+                    strcat(shit, a->strings[x + 1]);
+
+                    //set the record to the shity
+                    setRecord(&r, shit);
+
+                    //return the record as a string
+                    char *temp = printRecord(&r);
+
+                    //concatenate it to the block string called ret
+                    strcat(ret, temp);
+
+                    //free the shit
+                    free(shit);
+                    free(temp);
+
+                    // printf("%s\n", a->strings[x]);
                 }
+
+                //free the fucking string array
                 freeStringArray(a);
                 close(fd);
+                //return the ret
                 return ret;
             }
         }
@@ -386,14 +416,68 @@ char *findRecord(BTree t, char *key)
     return ret;
 }
 
+
+char* rangeSearch(BTree t, char* k1, char* k2)
+{
+    if(t == NULL || k1 == NULL || k2==NULL)return NULL;
+
+    char* s = findRecord(t, k1);
+    char* s2 = findRecord(t, k2);
+    int bn1 = -1;
+    int bn2 = -1;
+    forall(t->numLeaves)
+    {
+        BNode n = t->leaves[x];
+        for(int i = 0; i < n->numKeys; i++)
+        {
+            char* noNum = keyWithoutIndex(n->keys[i]);
+            if(strcmp(noNum, k1)==0)
+            {
+                bn1 = returnBlockNumber(n->keys[i]);
+            }
+            if(strcmp(noNum, k2)==0)
+            {
+                bn2 = returnBlockNumber(n->keys[i]);
+            }
+            free(noNum);
+        }
+    }
+
+
+    //FIX ME
+    int fd = open("sortedData.txt", O_CREAT | O_RDONLY);
+    lseek(fd, 0, SEEK_SET);
+
+}
+
+char* keyWithoutIndex(char* key)
+{
+    char* temp = calloc(1000, 1);
+    int idx = strlen(key) - 1;
+    while(isdigit(key[idx]))
+    {
+        if(idx < 0)break;
+        idx --;
+    }
+    idx++;
+    strncpy(temp, key, idx);
+    return temp;
+}
+
 int returnBlockNumber(char *key)
 {
 
     int idx = 0;
+    if (key == NULL)
+    {
+        printf("Null pointer exception\n");
+        return -1;
+    }
     //keep going through key until block number is found
     while (isdigit(key[idx]) == false)
     {
         idx++;
+        if(idx > strlen(key))break;
     }
 
     //create a temp char*
@@ -416,18 +500,17 @@ int returnBlockNumber(char *key)
 void addRecord(BTree t, char *key, char *value, int *fd)
 {
     *fd = open("sortedData.txt", O_RDONLY);
-     if (*fd == -1)
+    if (*fd == -1)
     {
         printf("File could not be found\n");
 
         return;
     }
-    lseek(*fd, -2*BLOCK_SIZE, SEEK_END);
+    lseek(*fd, -2 * BLOCK_SIZE, SEEK_END);
 
     //get the number of blocks
     int numBlocks = 0;
     read(*fd, &numBlocks, sizeof(int));
-    printf("xx blocks is %d\n", numBlocks);
     lseek(*fd, 0, SEEK_SET);
 
     //for each block, check to see if the key goes at that block number
@@ -446,7 +529,6 @@ void addRecord(BTree t, char *key, char *value, int *fd)
             close(*fd);
             *fd = open("sortedData.txt", O_WRONLY);
 
-            
             //add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
@@ -520,7 +602,7 @@ bool deleteRecord(BTree t, char *key)
 void writeRecordHash(char *key, char *value, unsigned long hash)
 {
     int fd = open("hashData.txt", O_CREAT | O_WRONLY);
-     if (fd == -1)
+    if (fd == -1)
     {
         printf("File could not be found\n");
 
@@ -544,7 +626,7 @@ void readRecordHash(unsigned long hash, Record *r)
 
     //open the file to read from
     int fd = open("hashData.txt", O_CREAT | O_RDONLY);
-     if (fd == -1)
+    if (fd == -1)
     {
         printf("File could not be found\n");
 
@@ -584,14 +666,15 @@ void readRecordHash(unsigned long hash, Record *r)
 void writeToHashFile(HashMap m, StringArray a, char *fileName)
 {
     int fd = open(fileName, O_CREAT | O_WRONLY);
-    if(fd == -1)return;
+    if (fd == -1)
+        return;
     lseek(fd, 0, SEEK_SET);
     forall(a->size)
     {
         Record r;
         setRecord(&r, a->strings[x]);
         put_hashmap(m, r.key, r.value);
-        writeRecordHash(r.key, r.value, hash(m, r.key)*RECORD_SIZE);
+        writeRecordHash(r.key, r.value, hash(m, r.key) * RECORD_SIZE);
     }
 
     close(fd);

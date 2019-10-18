@@ -71,36 +71,48 @@ int main(int argc, char *argv[])
             char *key = calloc(100, sizeof(char));
             char *value = calloc(100, sizeof(char));
             printf("Enter the key\n");
+            //get the user key
             scanf("%s", key);
             toLower(key);
+
+            //get the user value
             printf("Enter the value\n");
+            strcpy(value, "  ");
             scanf("%s", value);
+
+            //get the block number that the key should go to
             int blockNum = returnBlockNumber(key);
+            printf("block number is %d\n", blockNum);
+            //the new key is xx. Contains user entered key plus its block number
             char* xx = calloc(100, sizeof(char));
+            //strcat to xx the user entered key
             strcat(xx, key);
+            //convert block num to a string and concantenate it to xx
             char* temp = calloc(10, sizeof(char));
             sprintf(temp, "%d", blockNum);
             strcat(xx, temp);
-            printf("key is %s\n", xx);
+            //free the temp
             free(temp);
+
+            //check if the new key, xx,  already exists
             BNode n = findLeaf(t, xx);
             
-            print_tree(t, t->root);
+            //if it already exists don't add it, plus err msg
 
             if (n != NULL)
             {
                 printf("The record already exists\n");
             }
+            //else add the new key, xx, and the value
             else
             {
                 int fd;
-                addRecord(t, key, value, &fd);
+                addRecord(t, xx, value, &fd);
 
-                char *s = findRecord(t, key);
+                char *s = findRecord(t, xx);
                 if (s == NULL)
                 {
-                    printf("Whhyyyy\n");
-                    return 0;
+                    printf("Error adding the key\n");
                 }
                 printf("%s\n", s);
                 free(key);

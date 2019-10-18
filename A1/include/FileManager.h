@@ -24,6 +24,8 @@ BNode readNode(char* fileName, int idx);
 
 char* findRecord(BTree t, char* key);
 
+char* rangeSearch(BTree t, char* k1, char* k2);
+
 bool deleteRecord(BTree t, char* key);
 
 int returnBlockNumber(char* key);

@@ -286,9 +286,11 @@ BNode findLeafToInsert(BTree t, char *k)
 {
     if (t->numLeaves == 0)
         return t->root;
+
     forall(t->numLeaves)
     {
         BNode n = t->leaves[x];
+        if(strcmp(k, n->keys[0])<0)return t->leaves[0];
         if (strcmp(k, n->keys[0]) > 0 && strcmp(k, n->keys[n->numKeys - 1]) < 0)
         {
             return n;
