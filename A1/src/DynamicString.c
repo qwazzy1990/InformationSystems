@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "utilities.h"
 #include "DynamicString.h"
+#include <ctype.h>
 
 String newString(void)
 {
@@ -73,4 +74,13 @@ String readFile(char *fileName)
     return theFile;
 
     return NULL;
+}
+
+void toLower(char* s)
+{
+    if(s == NULL)return;
+    forall(strlen(s))
+    {
+        s[x] = tolower(s[x]);
+    }
 }

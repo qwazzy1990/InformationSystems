@@ -22,6 +22,7 @@ void freeString(String s);
 int stringCompare(const void* a, const void * b);
 String readFile(char *fileName);
 
+void toLower(char* s);
 
 
 

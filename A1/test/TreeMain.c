@@ -52,18 +52,17 @@ int main(int argc, char *argv[])
             char *key = calloc(100, sizeof(char));
             printf("Enter the key\n");
             scanf("%s", key);
-            BNode n = findLeaf(t, key);
-            if (n == NULL)
+            toLower(key);
+
+            char *s = findRecord(t, key);
+            if (s == NULL)
             {
-                printf("The record does not exist\n");
+                printf("Could not find record\n");
+                return 0;
             }
-            else
-            {
-                char *s = findRecord(t, key);
-                printf("%s\n", s);
-                free(key);
-                free(s);
-            }
+            printf("%s\n", s);
+            free(key);
+            free(s);
 
             //search for using a key
         }
@@ -73,6 +72,7 @@ int main(int argc, char *argv[])
             char *value = calloc(100, sizeof(char));
             printf("Enter the key\n");
             scanf("%s", key);
+            toLower(key);
             printf("Enter the value\n");
             scanf("%s", value);
             BNode n = findLeaf(t, key);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
                 addRecord(t, key, value, &fd);
 
                 char *s = findRecord(t, key);
-                if(s == NULL)
+                if (s == NULL)
                 {
                     printf("Whhyyyy\n");
                     return 0;

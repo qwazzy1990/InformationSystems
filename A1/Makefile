@@ -25,7 +25,7 @@ LIB:
 a1: makea1 runa1
 
 makea1: BIN INCLUDE SRC OBJ TEST LIB
-	$(CC) $(CFLAGS) -lm -Iinclude test/main.c src/*.c -o ./bin/a1
+	$(CC) $(CFLAGS) -lm -Iinclude test/TreeMain.c src/*.c -o ./bin/a1
 
 runa1: makea1
 	./bin/a1 $(INPUT)

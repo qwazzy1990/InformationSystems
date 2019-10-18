@@ -449,6 +449,8 @@ void addRecord(BTree t, char *key, char *value, int *fd)
             close(*fd);
             *fd = open("sortedData.txt", O_WRONLY);
 
+            
+
             //add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
