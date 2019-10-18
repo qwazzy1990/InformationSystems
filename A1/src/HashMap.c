@@ -173,7 +173,6 @@ ErrorCode get_hashmap(HashMap map, char *key, AnyData *value)
         return DNE;
     AnyData t = *value;
     char *s = map->printData(t);
-    printf("%s\n", s);
     free(s);
     status = OK;
     return status;
@@ -206,7 +205,6 @@ ErrorCode put_hashmap(HashMap map, char *key, AnyData value)
         return FULL;
     unsigned long index = hash(map, key);
     index = index % map->tableSize;
-    printf("index is %ld\n", index);
 
     assert(index < map->tableSize);
     ErrorCode status;
@@ -346,4 +344,20 @@ void print_error_code(ErrorCode code)
         printf("Status Data does not exist\n");
     if (code == FULL)
         printf("Status Table Full\n");
+}
+
+
+
+ErrorCode containsHash(HashMap m, char* key)
+{
+    unsigned long index = hash(m, key);
+
+    if(m->table[index]->inUse == false)return false;
+
+    while(m->table[index]->inUse)
+    {
+        if(strcmp(m->table[index]->key, key)==0)return true;
+        index++;
+    }
+    return false;
 }

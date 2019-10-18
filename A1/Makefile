@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -std=c11 -Wall -g -pedantic
-INPUT=test.txt
+INPUT=testTwo.txt
 
-all: a1
+all: h1
 
 BIN:
 	if [ ! -d "bin" ]; then mkdir bin; fi;
@@ -25,11 +25,19 @@ LIB:
 a1: makea1 runa1
 
 makea1: BIN INCLUDE SRC OBJ TEST LIB
-	$(CC) $(CFLAGS) -lm -Iinclude test/*.c src/*.c -o ./bin/a1
+	$(CC) $(CFLAGS) -lm -Iinclude test/main.c src/*.c -o ./bin/a1
 
 runa1: makea1
 	./bin/a1 $(INPUT)
 
+h1: makeh1 runh1
+
+makeh1: BIN INCLUDE SRC OBJ TEST LIB
+	$(CC) $(CFLAGS) -lm -Iinclude test/HashMain.c src/*.c -o ./bin/a1hash
+
+runh1: makeh1
+	./bin/a1hash $(INPUT)
+	
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;
 

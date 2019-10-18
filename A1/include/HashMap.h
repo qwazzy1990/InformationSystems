@@ -114,7 +114,7 @@ unsigned long table_size_hashmap(HashMap map);
 	 * **/
 ErrorCode put_hashmap(HashMap map, char* key, AnyData value);
 
-
+ErrorCode containsHash(HashMap , char* key);
 
 
 	/**
@@ -137,4 +137,5 @@ char* map_to_string(HashMap map);
 void print_error_code(ErrorCode code);
 
 unsigned long hash(HashMap m, char *str);
+
 #endif

@@ -18,23 +18,25 @@
 bool DEBUG1 = false;
 bool DEBUG2 = false;
 bool DEBUG3 = false;
-bool DEBUG4 = false;
+bool DEBUG4 = true;
 bool DEBUG5 = false;
-bool DEBUG6 = true;
+bool DEBUG6 = false;
 
-static char* printString( void* data)
+static char* printRecord( void* data)
 {
-    char* temp = (char*)data;
-    new_object(char*, s, strlen(temp)+1);
-    strcpy(s, temp);
+
+    Record* temp = (Record*)data;
+    new_object(char*, s, 300);
+    strcpy(s, temp->key);
+    strcpy(s, ": ");
+    strcpy(s, temp->value);
     return s;
 
 }
 
-static void deleteString( void* data)
+static void freeRecord( void* data)
 {
-    char* temp = (char*)data;
-    free(temp);
+    return;
 }
 int main(int argc, char *argv[])
 {
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
         BTree t = newBTree(8);
         int fd = 0;
         writeToFile(argv[1], &fd);
-        StringArray a = readFromFile("data.txt", &fd);
+        StringArray a = readFromFile(argv[1], &fd);
         int ffd = 0;
         writeToSortedFile(t, a, "sortedData.txt", &ffd);
 
@@ -115,9 +117,9 @@ int main(int argc, char *argv[])
         //  printf("%s\n", findRecord(t, "rrwsofsbc"));
         // deleteRecord(t, "rrwsofsbc");
         //  close(ffd);
-        //  addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
-        //  char* ss = findRecord(t, "bbuqcleji");
-        //  printf("%s\n", ss);
+         addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
+         char* ss = findRecord(t, "bbuqcleji");
+          printf("%s\n", ss);
 
         //print_tree(t, t->root);
 
@@ -139,13 +141,15 @@ int main(int argc, char *argv[])
 
     if(DEBUG6)
     {
-        HashMap m = new_hashmap(printString, deleteString, 4);
+        HashMap m = new_hashmap(printRecord, freeRecord, 4);
         int k;
         StringArray sa = readFromFile(argv[1], &k);
         writeToHashFile(m, sa, "hashData.txt");
         freeStringArray(sa);
         Record r;
-        readRecordHash("", &r);
+        readRecordHash(hash(m, "cdyggxxpk")*RECORD_SIZE, &r);
+        printf("%s\n%s\n", r.key, r.value);
+        printf("%d\n", containsHash(m, "bbfsss"));
 
 
         destroy_hashmap(m);

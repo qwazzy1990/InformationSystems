@@ -21,8 +21,15 @@ void writeToFile(char *fileName, int *fd)
 {
     String theFile = readFile(fileName);
     *fd = open("data.txt", O_CREAT | O_WRONLY, 0);
+    if (*fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
     write(*fd, theFile->string, strlen(theFile->string));
     close(*fd);
+
     freeString(theFile);
 }
 
@@ -31,6 +38,12 @@ StringArray readFromFile(char *fileName, int *fd)
 {
     //open the file
     *fd = open(fileName, O_RDONLY, 0);
+     if (*fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return NULL;
+    }
 
     //used to calculate the numbe of bytes in the file
     int len = 0;
@@ -80,6 +93,12 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
 {
     //open the file for writing. This file will bec
     *fd = open(fileName, O_CREAT | O_WRONLY);
+     if (*fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
     Record records[a->size];
     Block **blocks = calloc(a->size / 5 + 1000, sizeof(*blocks));
     forall(a->size / 5 + 1000)
@@ -87,6 +106,7 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
         blocks[x] = newBlock();
     }
     //write each string in one at a time
+    printf("%d\n", a->size);
     forall(a->size)
     {
         setRecord(&records[x], a->strings[x]);
@@ -99,6 +119,7 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
     // write each block to the file
     forall(numBlocks)
     {
+        printf("NUmber of blocks is %d\n", numBlocks);
         writeBlock(t, *fd, blocks[x]);
     }
     /**TESTING PURPOSES**/
@@ -145,6 +166,7 @@ void writeBlock(BTree t, int fd, Block *b)
 {
     //write  the block number
     write(fd, &(b->blockNumber), sizeof(int));
+    printf("writing the bn %d\n", b->blockNumber);
 
     //for each record in the block
     forall(b->numRecords)
@@ -168,7 +190,7 @@ void writeBlock(BTree t, int fd, Block *b)
         free(temp);
     }
 
-    int offset = 1024 - (b->numRecords * (KEY_SIZE + VAL_SIZE) + sizeof(int));
+    int offset = BLOCK_SIZE - (b->numRecords * (RECORD_SIZE) + sizeof(int));
     new_object(char *, s, offset);
     forall(offset)
     {
@@ -180,13 +202,19 @@ void writeBlock(BTree t, int fd, Block *b)
 
 //Writes a node to the tree file
 
-void writeNode(char* fileName, BNode n, int idk)
+void writeNode(char *fileName, BNode n, int idk)
 {
     int fd = open(fileName, O_CREAT | O_WRONLY);
+     if (fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
 
     lseek(fd, 0, SEEK_SET);
 
-    new_object(char*, s, 400);
+    new_object(char *, s, 400);
 
     int num;
 
@@ -198,30 +226,39 @@ void writeNode(char* fileName, BNode n, int idk)
     //write each key
     forall(n->numKeys)
     {
-        char* temp = calloc(300, sizeof(char));
+        char *temp = calloc(300, sizeof(char));
         strcpy(temp, n->keys[x]);
         write(fd, temp, KEY_SIZE);
         free(temp);
     }
 
     //if the leaf has been added then write 1
-    if(n->beenAdded) num = 1;
-    else num = 0; //else write 0
+    if (n->beenAdded)
+        num = 1;
+    else
+        num = 0; //else write 0
     write(fd, &num, sizeof(int));
 
     //if the leaf has been deleted write 1
-    if(n->deleted) num = 1;
-    else num = 0;//else write 0
+    if (n->deleted)
+        num = 1;
+    else
+        num = 0; //else write 0
     write(fd, &num, sizeof(int));
 
     close(fd);
 }
 
-
-BNode readNode(char* fileName, int idx)
+BNode readNode(char *fileName, int idx)
 {
     //open the file
     int fd = open(fileName, O_CREAT | O_RDONLY);
+     if (fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return NULL;
+    }
     lseek(fd, 0, SEEK_SET);
 
     //create a node
@@ -237,7 +274,7 @@ BNode readNode(char* fileName, int idx)
     printf("%d\n", numKeys);
     forall(numKeys)
     {
-        char* temp = calloc(100, sizeof(char));
+        char *temp = calloc(100, sizeof(char));
         read(fd, temp, KEY_SIZE);
         add_key(n, temp);
         free(temp);
@@ -247,28 +284,37 @@ BNode readNode(char* fileName, int idx)
     int num = 0;
     read(fd, &num, sizeof(int));
     printf("been added is %d\n", num);
-    if(num == 0)n->beenAdded = false;
-    else n->beenAdded = true;
+    if (num == 0)
+        n->beenAdded = false;
+    else
+        n->beenAdded = true;
 
     read(fd, &num, sizeof(int));
     printf("been deleted is %d\n", num);
-    if(num == 0)n->deleted  = false;
-    else n->deleted = true;
+    if (num == 0)
+        n->deleted = false;
+    else
+        n->deleted = true;
 
-    char* s = printNode(n);
+    char *s = printNode(n);
     printf("%s\n", s);
     free(s);
     freeNode(n);
 
     close(fd);
     return NULL;
-
 }
 StringArray readBlock(int fd, int offset)
 {
+     if (fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return NULL;
+    }
     lseek(fd, offset, SEEK_SET);
     char temp[10000];
-    read(fd, temp, 1024);
+    read(fd, temp, BLOCK_SIZE);
     String s = newString();
     addString(s, temp);
     String delims = newString();
@@ -312,19 +358,27 @@ char *findRecord(BTree t, char *key)
             {
 
                 int fd = open("sortedData.txt", O_RDONLY);
-                StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * 1024 + 4);
+                StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * BLOCK_SIZE + 4);
 
                 //find the correct record
                 forall(a->size)
                 {
                     if (strcmp(key, a->strings[x]) == 0)
-                    {
+                     {
                         ret = calloc(VAL_SIZE, 1);
                         strcpy(ret, a->strings[x + 1]);
                         freeStringArray(a);
                         close(fd);
                         return ret;
                     }
+                    // strcat(ret, "Key:");
+                    // strcat(ret, a->strings[x]);
+                    // strcat(ret, "\n");
+                    // strcat(ret, "Val:");
+                    // strcat(ret, a->strings[x+1]);
+                    // strcat(ret, "\n\n");
+                    // x+=2;
+
                 }
                 freeStringArray(a);
                 close(fd);
@@ -365,18 +419,24 @@ int returnBlockNumber(char *key)
 void addRecord(BTree t, char *key, char *value, int *fd)
 {
     *fd = open("sortedData.txt", O_RDONLY);
-    printf("fd is %d\n", *fd);
-    lseek(*fd, -1024, SEEK_END);
+     if (*fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
+    lseek(*fd, -2*BLOCK_SIZE, SEEK_END);
 
     //get the number of blocks
     int numBlocks = 0;
-    read(*fd, &numBlocks, 4);
+    read(*fd, &numBlocks, sizeof(int));
+    printf("xx blocks is %d\n", numBlocks);
     lseek(*fd, 0, SEEK_SET);
 
     //for each block, check to see if the key goes at that block number
     forall(numBlocks)
     {
-        StringArray sa = readBlock(*fd, x * 1024 + 4);
+        StringArray sa = readBlock(*fd, x * BLOCK_SIZE + 4);
         if (sa->size % 2 == 1)
         {
             strcpy(sa->strings[sa->size - 1], "");
@@ -410,10 +470,10 @@ void addRecord(BTree t, char *key, char *value, int *fd)
             }
             freeStringArray(sa);
 
-            lseek(*fd, x * 1024, SEEK_SET);
+            lseek(*fd, x * BLOCK_SIZE, SEEK_SET);
             writeBlock(t, *fd, b);
             free(b);
-            //write(*fd, temp, 1024);
+            //write(*fd, temp, BLOCK_SIZE);
             close(*fd);
             break;
         }
@@ -457,18 +517,21 @@ bool deleteRecord(BTree t, char *key)
     return false;
 }
 
-
-
 //For Hash Map
 
-void writeRecordHash(char* key, char* value, unsigned long hash)
+void writeRecordHash(char *key, char *value, unsigned long hash)
 {
     int fd = open("hashData.txt", O_CREAT | O_WRONLY);
+     if (fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
     lseek(fd, 0, SEEK_SET);
     lseek(fd, hash, SEEK_SET);
-    printf("hash is %ld\n", hash);
     Record r;
-    char* temp = calloc(150, sizeof(char));
+    char *temp = calloc(150, sizeof(char));
     strcpy(temp, key);
     strcat(temp, " ");
     strcat(temp, value);
@@ -478,14 +541,20 @@ void writeRecordHash(char* key, char* value, unsigned long hash)
     close(fd);
 }
 
-void readRecordHash( unsigned long hash, Record* r)
+void readRecordHash(unsigned long hash, Record *r)
 {
 
     //open the file to read from
     int fd = open("hashData.txt", O_CREAT | O_RDONLY);
+     if (fd == -1)
+    {
+        printf("File could not be found\n");
+
+        return;
+    }
 
     //create a temp
-    char* temp = calloc(1000, sizeof(char));
+    char *temp = calloc(1000, sizeof(char));
     //seek to the hash value
     lseek(fd, hash, SEEK_SET);
     //read it in
@@ -501,27 +570,31 @@ void readRecordHash( unsigned long hash, Record* r)
     freeString(delims);
     freeString(s);
 
+    printf("%s\n", sa->strings[0]);
     //copy the key in the file into  the record
     strcpy((*r).key, sa->strings[0]);
     //copy the value in the file to the record
-    foreach(1, sa->size)
+    foreach (1, sa->size)
     {
         strcat((*r).value, sa->strings[x]);
-    } 
+    }
     printf("%s %s\n", (*r).key, (*r).value);
     //close the file
     close(fd);
 }
 
-void writeToHashFile(HashMap m, StringArray a, char* fileName)
+void writeToHashFile(HashMap m, StringArray a, char *fileName)
 {
     int fd = open(fileName, O_CREAT | O_WRONLY);
-    lseek(fd, 0,  SEEK_SET);
+    if(fd == -1)return;
+    lseek(fd, 0, SEEK_SET);
     forall(a->size)
     {
         Record r;
         setRecord(&r, a->strings[x]);
         put_hashmap(m, r.key, r.value);
-        writeRecordHash(r.key, r.value, hash(m, r.key));
+        writeRecordHash(r.key, r.value, hash(m, r.key)*RECORD_SIZE);
     }
+
+    close(fd);
 }
