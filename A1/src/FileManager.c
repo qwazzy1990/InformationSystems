@@ -106,7 +106,6 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
         blocks[x] = newBlock();
     }
     //write each string in one at a time
-    printf("%d\n", a->size);
     forall(a->size)
     {
         setRecord(&records[x], a->strings[x]);
@@ -119,7 +118,6 @@ void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
     // write each block to the file
     forall(numBlocks)
     {
-        printf("NUmber of blocks is %d\n", numBlocks);
         writeBlock(t, *fd, blocks[x]);
     }
     /**TESTING PURPOSES**/
@@ -166,7 +164,6 @@ void writeBlock(BTree t, int fd, Block *b)
 {
     //write  the block number
     write(fd, &(b->blockNumber), sizeof(int));
-    printf("writing the bn %d\n", b->blockNumber);
 
     //for each record in the block
     forall(b->numRecords)
@@ -450,7 +447,6 @@ void addRecord(BTree t, char *key, char *value, int *fd)
             *fd = open("sortedData.txt", O_WRONLY);
 
             
-
             //add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);

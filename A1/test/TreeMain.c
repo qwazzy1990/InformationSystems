@@ -75,7 +75,18 @@ int main(int argc, char *argv[])
             toLower(key);
             printf("Enter the value\n");
             scanf("%s", value);
-            BNode n = findLeaf(t, key);
+            int blockNum = returnBlockNumber(key);
+            char* xx = calloc(100, sizeof(char));
+            strcat(xx, key);
+            char* temp = calloc(10, sizeof(char));
+            sprintf(temp, "%d", blockNum);
+            strcat(xx, temp);
+            printf("key is %s\n", xx);
+            free(temp);
+            BNode n = findLeaf(t, xx);
+            
+            print_tree(t, t->root);
+
             if (n != NULL)
             {
                 printf("The record already exists\n");
@@ -96,6 +107,13 @@ int main(int argc, char *argv[])
                 free(value);
                 free(s);
             }
+        }
+
+        
+
+        if(c == '5')
+        {
+            print_tree(t, t->root);
         }
 
         if (c == '6')
