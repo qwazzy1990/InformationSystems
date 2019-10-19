@@ -22,17 +22,7 @@ bool DEBUG4 = true;
 bool DEBUG5 = false;
 bool DEBUG6 = false;
 
-static char* printRecord( void* data)
-{
 
-    Record* temp = (Record*)data;
-    new_object(char*, s, 300);
-    strcpy(s, temp->key);
-    strcpy(s, ": ");
-    strcpy(s, temp->value);
-    return s;
-
-}
 
 static void freeRecord( void* data)
 {
@@ -117,13 +107,16 @@ int main(int argc, char *argv[])
         //  printf("%s\n", findRecord(t, "rrwsofsbc"));
         // deleteRecord(t, "rrwsofsbc");
         //  close(ffd);
-         addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
-         char* ss = findRecord(t, "bbuqcleji");
-          printf("%s\n", ss);
+        //  addRecord(t, "bbuqcleji ", "Who the fuck writes information systems in C", &ffd);
+        //  char* ss = findRecord(t, "bbuqcleji");
+        //   printf("%s\n", ss);
 
         //print_tree(t, t->root);
 
-        writeNode("tree.txt", t->leaves[0], 0);
+        char* blocks = rangeSearch(t, "fsarcbyne", "yxacbhhki");
+        printf("%s\n", blocks);
+        free(blocks);
+        //writeNode("tree.txt", t->leaves[0], 0);
         deleteTree(t);
     }
     if (DEBUG5)

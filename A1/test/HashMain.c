@@ -14,17 +14,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-static char *printRecord(void *data)
-{
-
-    Record *temp = (Record *)data;
-    new_object(char *, s, 300);
-    strcpy(s, temp->key);
-    strcpy(s, ": ");
-    strcpy(s, temp->value);
-    return s;
-}
-
 static void freeRecord(void *data)
 {
     return;
@@ -33,7 +22,8 @@ int main(int argc, char *argv[])
 {
     printf("Welcome to Hash Map Usage\n");
     int fd;
-    printf("File is loading, please wait\n");
+    printf("%s is loading, please wait\n", argv[1]);
+
     StringArray sa = readFromFile(argv[1], &fd);
 
     if (sa == NULL)
@@ -52,9 +42,10 @@ int main(int argc, char *argv[])
 
     while (c != '4')
     {
-         c = getchar();
+        c = getchar();
         if (c == '1')
         {
+            printf("Adding a new record to hashData.txt\n");
             char *key = calloc(100, sizeof(char));
             char *value = calloc(200, sizeof(char));
             printf("Enter the key\n");
@@ -78,6 +69,7 @@ int main(int argc, char *argv[])
         }
         else if (c == '2')
         {
+            printf("Removing a record from hashData.txt\n");
             printf("Enter the key of the record you want to remove\n");
             char *key = calloc(100, sizeof(char));
             printf("Enter the key\n");
@@ -96,6 +88,7 @@ int main(int argc, char *argv[])
         else if (c == '3')
         {
             char *key = calloc(100, sizeof(char));
+            printf("Search for a record in hashData.txt\n");
             printf("Enter the key\n");
             scanf("%s", key);
             if (containsHash(m, key) == false)
@@ -109,14 +102,12 @@ int main(int argc, char *argv[])
                 printf("Found the record\n%s %s\n", r.key, r.value);
             }
         }
-        else if(c == '4')
+        else if (c == '4')
         {
             printf("Good bye\n");
             destroy_hashmap(m);
             return 0;
         }
-
-       
     }
 
     return 0;

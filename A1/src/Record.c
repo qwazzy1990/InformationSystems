@@ -71,3 +71,30 @@ char* printRecord(void * r)
     strcat(temp, "\n");
     return temp;
 }
+
+char* printBlock(StringArray sa, int bn)
+{
+    if(sa->size %2 == 1) sa->size--;
+
+    char* tempNum = calloc(100, sizeof(char));
+    sprintf(tempNum, "%d", bn);
+    char* ss = calloc(BLOCK_SIZE+300, sizeof(char));
+    strcat(ss, "BLOCK NUMBER: ");
+    strcat(ss, tempNum);
+    strcat(ss, "\n");
+    free(tempNum);
+    for(int x = 0; x < sa->size; x+=2)
+    {
+        Record r;
+        char* shit = calloc(1000, sizeof(char));
+        strcat(shit, sa->strings[x]);
+        strcat(shit, " ");
+        strcat(shit, sa->strings[x+1]);
+        setRecord(&r, shit);
+        char* tempRec = printRecord(&r);
+            strcat(ss, tempRec);
+        free(tempRec);
+    }
+
+    return ss;
+}

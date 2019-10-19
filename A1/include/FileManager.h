@@ -25,6 +25,7 @@ BNode readNode(char* fileName, int idx);
 char* findRecord(BTree t, char* key);
 
 char* rangeSearch(BTree t, char* k1, char* k2);
+char* keyWithoutIndex(char* key);
 
 bool deleteRecord(BTree t, char* key);
 

@@ -88,7 +88,7 @@ StringArray readFromFile(char *fileName, int *fd)
 }
 
 //Write the sorted string array to the file.
-//fileName will be called sortedData.txt
+//fileName will be called TreeData.txt
 void writeToSortedFile(BTree t, StringArray a, char *fileName, int *fd)
 {
     //open the file for writing. This file will bec
@@ -181,6 +181,7 @@ void writeBlock(BTree t, int fd, Block *b)
 
         //add the file key plus block number as the key in the BTree
         addKey(t, temp);
+
         //write the record to the file descriptor
         writeRecord(fd, b->records[x]);
 
@@ -268,14 +269,12 @@ BNode readNode(char *fileName, int idx)
     lseek(fd, 4, idx);
     int numKeys = 0;
     read(fd, &(numKeys), sizeof(int));
-    printf("%d\n", numKeys);
     forall(numKeys)
     {
         char *temp = calloc(100, sizeof(char));
         read(fd, temp, KEY_SIZE);
         add_key(n, temp);
         free(temp);
-        printf("%s\n", n->keys[x]);
     }
 
     int num = 0;
@@ -349,16 +348,16 @@ char *findRecord(BTree t, char *key)
                 idx--;
             }
             idx++;
-            printf("%s\n", curNode->keys[i]);
 
             //if key equals the curNode's key minus the block number then you found the key.
             if (strncmp(key, curNode->keys[i], idx) == 0)
             {
 
-                int fd = open("sortedData.txt", O_RDONLY);
+                int fd = open("TreeData.txt", O_RDONLY);
                 StringArray a = readBlock(fd, returnBlockNumber(curNode->keys[i]) * BLOCK_SIZE + 4);
                 if (a->size % 2 == 1)
                 {
+                    free(a->strings[a->size-1]);
                     a->size--;
                 }
                 strcat(ret, "BLOCK NUMBER: ");
@@ -416,26 +415,26 @@ char *findRecord(BTree t, char *key)
     return ret;
 }
 
-
-char* rangeSearch(BTree t, char* k1, char* k2)
+char *rangeSearch(BTree t, char *k1, char *k2)
 {
-    if(t == NULL || k1 == NULL || k2==NULL)return NULL;
+    if (t == NULL || k1 == NULL || k2 == NULL)
+        return NULL;
 
-    char* s = findRecord(t, k1);
-    char* s2 = findRecord(t, k2);
+    //char* s = findRecord(t, k1);
+    //char* s2 = findRecord(t, k2);
     int bn1 = -1;
     int bn2 = -1;
     forall(t->numLeaves)
     {
         BNode n = t->leaves[x];
-        for(int i = 0; i < n->numKeys; i++)
+        for (int i = 0; i < n->numKeys; i++)
         {
-            char* noNum = keyWithoutIndex(n->keys[i]);
-            if(strcmp(noNum, k1)==0)
+            char *noNum = keyWithoutIndex(n->keys[i]);
+            if (strcmp(noNum, k1) == 0)
             {
                 bn1 = returnBlockNumber(n->keys[i]);
             }
-            if(strcmp(noNum, k2)==0)
+            if (strcmp(noNum, k2) == 0)
             {
                 bn2 = returnBlockNumber(n->keys[i]);
             }
@@ -443,21 +442,37 @@ char* rangeSearch(BTree t, char* k1, char* k2)
         }
     }
 
-
     //FIX ME
-    int fd = open("sortedData.txt", O_CREAT | O_RDONLY);
+    int fd = open("TreeData.txt", O_CREAT | O_RDONLY);
     lseek(fd, 0, SEEK_SET);
+    if (bn1 == -1 || bn2 == -1 || fd == -1)
+        return NULL;
+    char *blocks = calloc(100 * BLOCK_SIZE, sizeof(char));
+    foreach (bn1, bn2)
+    {
+        lseek(fd, x * BLOCK_SIZE, SEEK_SET);
+        int blockNum;
+        read(fd, &blockNum, 4);
+        lseek(fd, 0, SEEK_SET);
 
+        StringArray sa = readBlock(fd, x * BLOCK_SIZE + 4);
+        char *block = printBlock(sa, blockNum);
+        strcat(blocks, block);
+        free(block);
+    }
+    printf("%s\n", blocks);
+    return blocks;
 }
 
-char* keyWithoutIndex(char* key)
+char *keyWithoutIndex(char *key)
 {
-    char* temp = calloc(1000, 1);
+    char *temp = calloc(1000, 1);
     int idx = strlen(key) - 1;
-    while(isdigit(key[idx]))
+    while (isdigit(key[idx]))
     {
-        if(idx < 0)break;
-        idx --;
+        if (idx < 0)
+            break;
+        idx--;
     }
     idx++;
     strncpy(temp, key, idx);
@@ -477,7 +492,8 @@ int returnBlockNumber(char *key)
     while (isdigit(key[idx]) == false)
     {
         idx++;
-        if(idx > strlen(key))break;
+        if (idx > strlen(key))
+            break;
     }
 
     //create a temp char*
@@ -499,7 +515,7 @@ int returnBlockNumber(char *key)
 
 void addRecord(BTree t, char *key, char *value, int *fd)
 {
-    *fd = open("sortedData.txt", O_RDONLY);
+    *fd = open("TreeData.txt", O_RDONLY);
     if (*fd == -1)
     {
         printf("File could not be found\n");
@@ -514,22 +530,98 @@ void addRecord(BTree t, char *key, char *value, int *fd)
     lseek(*fd, 0, SEEK_SET);
 
     //for each block, check to see if the key goes at that block number
-    forall(numBlocks)
+    printf("Num blocks is %d\n", numBlocks);
+    forall(numBlocks + 1)
     {
+
         StringArray sa = readBlock(*fd, x * BLOCK_SIZE + 4);
+        printf("Sa size is %d\n", sa->size);
+
         if (sa->size % 2 == 1)
         {
             strcpy(sa->strings[sa->size - 1], "");
+            free(sa->strings[sa->size-1]);
             sa->size--;
         }
-        //printf("sa size is %d\n", sa->size);
 
+        if (x == 0 && strcmp(key, sa->strings[0]) < 0)
+        {
+            close(*fd);
+            printf("Match found\n");
+            *fd = open("TreeData.txt", O_WRONLY);
+
+            // add the new key and value to the block
+            addStringArray(sa, key);
+            addStringArray(sa, value);
+            Block *b = newBlock();
+            b->blockNumber = x;
+            b->numRecords = sa->size / 2;
+            int count = 0;
+            for (int i = 0; i < sa->size; i += 2)
+            {
+                char temp[1000];
+                strcpy(temp, sa->strings[i]);
+                strcat(temp, " ");
+                strcat(temp, sa->strings[i + 1]);
+                Record r;
+                setRecord(&r, temp);
+                r.blockNum = x;
+                b->records[count] = r;
+                count++;
+            }
+            freeStringArray(sa);
+
+            lseek(*fd, x * BLOCK_SIZE, SEEK_SET);
+            writeBlock(t, *fd, b);
+            free(b);
+            //write(*fd, temp, BLOCK_SIZE);
+            close(*fd);
+            break;
+        }
+        //printf("sa size is %d\n", sa->size);
+        printf("key first key last key %s %s %s\n", key, sa->strings[0], sa->strings[sa->size - 2]);
         if (strcmp(sa->strings[0], key) <= 0 && (strcmp(sa->strings[sa->size - 2], key) >= 0))
         {
             close(*fd);
-            *fd = open("sortedData.txt", O_WRONLY);
+            printf("Match found\n");
+            *fd = open("TreeData.txt", O_WRONLY);
 
-            //add the new key and value to the block
+            // add the new key and value to the block
+            addStringArray(sa, key);
+            addStringArray(sa, value);
+            Block *b = newBlock();
+            b->blockNumber = x;
+            b->numRecords = sa->size / 2;
+            int count = 0;
+            for (int i = 0; i < sa->size; i += 2)
+            {
+                char temp[1000];
+                strcpy(temp, sa->strings[i]);
+                strcat(temp, " ");
+                strcat(temp, sa->strings[i + 1]);
+                Record r;
+                setRecord(&r, temp);
+                r.blockNum = x;
+                b->records[count] = r;
+                count++;
+            }
+            freeStringArray(sa);
+
+            lseek(*fd, x * BLOCK_SIZE, SEEK_SET);
+            writeBlock(t, *fd, b);
+            free(b);
+            //write(*fd, temp, BLOCK_SIZE);
+            close(*fd);
+            break;
+        }
+
+        if (x == numBlocks)
+        {
+            close(*fd);
+            printf("Match found\n");
+            *fd = open("TreeData.txt", O_WRONLY);
+
+            // add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
             Block *b = newBlock();

@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
 
     printf("Welcome to B+ Tree Usage\n");
-    printf("File is loading, please wait\n");
+    printf("%s is loading, please wait\n", argv[1]);
     int fd;
 
     writeToFile(argv[1], &fd);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     BTree t = newBTree(8);
     fd = 0;
     int ffd = 0;
-    writeToSortedFile(t, a, "sortedData.txt", &ffd);
+    writeToSortedFile(t, a, "TreeData.txt", &ffd);
 
     printf("Press 1 to search for a record by entering a key\n");
     printf("Press 2 to range search using index\n");
@@ -49,8 +49,9 @@ int main(int argc, char *argv[])
         c = getchar();
         if (c == '1')
         {
+            printf("Searching for a record in TreeData.txt\n");
             char *key = calloc(100, sizeof(char));
-            printf("Enter the key\n");
+            printf("Enter the key to search for\n");
             scanf("%s", key);
             toLower(key);
 
@@ -66,23 +67,45 @@ int main(int argc, char *argv[])
 
             //search for using a key
         }
+
+        if(c == '2')
+        {
+            printf("Performing a range search in TreeData.txt\n");
+            char* k1 = calloc(100, sizeof(char));
+            char* k2 = calloc(100, sizeof(char));
+            printf("Enter the first key\n");
+            scanf("%s", k1);
+            printf("Enter the second key\n");
+            scanf("%s", k2);
+
+            char* s = rangeSearch(t, k1, k2);
+            free(k1);
+            free(k2);
+            if(s == NULL)
+            {
+                printf("The range searched failed\n");
+            }else{
+                printf("%s\n", s);
+                free(s);
+            }
+        }
         if (c == '3')
         {
+            printf("Adding a record to TreeData.txt\n");
             char *key = calloc(100, sizeof(char));
             char *value = calloc(100, sizeof(char));
-            printf("Enter the key\n");
+            printf("Enter the key to add\n");
             //get the user key
             scanf("%s", key);
             toLower(key);
 
             //get the user value
-            printf("Enter the value\n");
+            printf("Enter the value to add\n");
             strcpy(value, "  ");
             scanf("%s", value);
 
             //get the block number that the key should go to
             int blockNum = returnBlockNumber(key);
-            printf("block number is %d\n", blockNum);
             //the new key is xx. Contains user entered key plus its block number
             char* xx = calloc(100, sizeof(char));
             //strcat to xx the user entered key
@@ -121,15 +144,36 @@ int main(int argc, char *argv[])
             }
         }
 
-        
+        if(c == '4')
+        {
+            printf("Deleting a record from TreeData.txt\n");
+            printf("Enter the key to delete\n");
+            char* key = calloc(100, sizeof(char));
+            scanf("%s", key);
+            char* record = findRecord(t, key);
+            if(record == NULL)
+            {
+                printf("The record does not exist\n");
+                free(key);
+            }else{
+                printf("Successfully deleted record\n");
+                deleteRecord(t, key);
+                free(key);
+                free(record);
+            }
+
+        }
 
         if(c == '5')
         {
+            printf("Printing all the records in TreeData.txt\n");
             print_tree(t, t->root);
         }
 
         if (c == '6')
         {
+            printf("Good bye\n");
+            deleteTree(t);
             return 0;
         }
     }

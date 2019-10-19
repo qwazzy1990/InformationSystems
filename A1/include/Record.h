@@ -8,6 +8,9 @@
 #define NUM_RECORDS 5
 #define RECORD_SIZE 164
 
+#include "StringArray.h"
+#include "DynamicString.h"
+
 
 
 struct record{
@@ -32,6 +35,8 @@ Block* newBlock( void );
 void packRecords(Block** b, Record* r, int numRecords, int* numBlocks);
 
 char* printRecord(void * r);
+char* printBlock(StringArray sa, int bn);
+
 
 
 #endif
