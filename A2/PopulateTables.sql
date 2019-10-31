@@ -13,3 +13,16 @@ INSERT INTO Projects Values
 
 
 
+INSERT INTO Reports VALUES
+    (552, 'A space efficient data warehouse', 302),
+    (552, 'A space efficient data warehouse', 303),
+    (554, 'Computer vision based crop growth monitoring', 301),
+    (561, 'Automated data extraction in big data analytics', 302),
+    (561, 'Automated data extraction in big data analytics',  303),
+    (565, 'A new hashing structure for large key-value data sets',  303),
+    (577, 'Yet another language for big data analysis', 303),
+    (577, 'Yet another language for big data analysis', 304);
+
+
+
+
