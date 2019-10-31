@@ -1,2 +1,5 @@
-INSERT INTO Projects VALUES
-    (10001, "A unified database structure for structured/unstructured/semistructured data", 6733, 302,  
+INSERT INTO Topics VALUES
+    (301, "Machine Learning"),
+    (302 "Databases"),
+    (303, "Big Data"),
+    (304, "Programming Languages"); 
