@@ -3,6 +3,8 @@ CFLAGS = -std=c11 -Wall -g -pedantic
 INPUT=testTwo.txt
 
 
+all: clean
+
 BIN:
 	if [ ! -d "bin" ]; then mkdir bin; fi;
 
@@ -37,15 +39,15 @@ makeh1: BIN INCLUDE SRC OBJ TEST LIB
 runh1: makeh1
 	./bin/a1hash $(INPUT)
 
-test: maketest runtest
 
-maketest: BIN INCLUDE SRC OBJ TEST LIB
-	$(CC) $(CFLAGS) -lm -Iinclude test/main.c src/*.c -o ./bin/a1test
-
-runtest: maketest 
-	./bin/a1test $(INPUT)
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;
+
+
+cleanFiles:
+	if test -f TreeData.txt; then rm TreeData.txt; fi;
+	if test -f hashData.txt; then rm hashData.txt; fi;
+
 
 push:
 	git add -A 

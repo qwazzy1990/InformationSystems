@@ -16,22 +16,6 @@
 #include <unistd.h>
 #include <ctype.h>
 
-//open the original system file from argv[1] and write to it
-void writeToFile(char *fileName, int *fd)
-{
-    String theFile = readFile(fileName);
-    *fd = open("data.txt", O_CREAT | O_WRONLY, 0);
-    if (*fd == -1)
-    {
-        printf("File could not be found\n");
-
-        return;
-    }
-    write(*fd, theFile->string, strlen(theFile->string));
-    close(*fd);
-
-    freeString(theFile);
-}
 
 //read the original system file into a StringArray and sort the originl system file by key
 StringArray readFromFile(char *fileName, int *fd)

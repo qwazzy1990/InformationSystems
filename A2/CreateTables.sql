@@ -1,0 +1,1 @@
+CREATE TABLE TestTable(ID integer, name char);

@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
     printf("%s is loading, please wait\n", argv[1]);
     int fd;
 
-    writeToFile(argv[1], &fd);
 
     StringArray a = readFromFile(argv[1], &fd);
 
