@@ -20,7 +20,7 @@ CREATE TABLE Reports(report_number integer NOT NULL,
 );
 
 -- Table for funding agencies. The fund_name is the name of the agency and is primary key
-CREATE TABLE FundingAgencies(fund_name varchar(50) NOT NULL PRIMARY KEY, address varchar(300));
+CREATE TABLE FundingAgencies(fund_name varchar(50) NOT NULL PRIMARY KEY, address varchar(300), phone varchar(20));
 
 -- Table for grants. The primary key is the grant_number
 CREATE TABLE Grants(grant_number integer NOT NULL PRIMARY KEY, 
