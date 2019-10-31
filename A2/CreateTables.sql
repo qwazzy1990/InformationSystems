@@ -14,7 +14,7 @@ CREATE TABLE Projects(project_number integer NOT NULL,
 
 -- Table for reports. primary key is the report_number + topic_id
 CREATE TABLE Reports(report_number integer NOT NULL, 
-    title varchar(50), 
+    title varchar(300), 
     topic_id integer, 
     PRIMARY KEY(report_number, topic_id)
 );
