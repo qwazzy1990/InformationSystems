@@ -38,5 +38,6 @@ CREATE TABLE Researchers(researcher_number integer NOT NULL,
     email varchar(50),
     project_id integer,
     report_id integer,
+    pi boolean,
     PRIMARY KEY(researcher_number, project_id, report_id)
 );
