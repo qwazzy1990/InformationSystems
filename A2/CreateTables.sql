@@ -9,9 +9,7 @@ CREATE TABLE Topics(topic_number integer NOT NULL PRIMARY KEY, topic varchar(50)
 -- /*Table for the projects, primary key is project number plus topic_id which is foreign key to a topic*/
 CREATE TABLE Projects(project_number integer NOT NULL, 
     project_name varchar(300), 
-    grant_id integer, 
     topic_id integer, 
-    researcher_id integer,
     PRIMARY KEY(project_number, topic_id));
 
 -- Table for reports. primary key is the report_number + topic_id
