@@ -17,7 +17,7 @@ CREATE OR REPLACE FUNCTION findPI() RETURNS void as $$
 DECLARE 
     --check if the researcher is a pi and put their info into id, rname and isPi
     c1 cursor for SELECT DISTINCT researcher_number, researcher_name, pi, project_id from Researchers;
-    c2 cursor for SELECT amount from Grants;
+    c2 cursor (id integer) for SELECT amount from Grants where project_id = id;
     projId integer;
     id integer;
     rname varchar(100);
@@ -31,8 +31,12 @@ BEGIN
         if (isPi = true) then
             RAISE NOTICE 'ID: %', id;
             RAISE NOTICE 'Name: %', rname;
-            RAISE NOTICE 'I do not like to share my income';
-            fetch c2 into amnt where Grants.project_id = projId; 
+            open c2(id:=projId);
+            fetch c2 into amnt;
+            RAISE NOTICE 'Amount %', amnt;
+            close c2;
+
+
         else
             RAISE NOTICE 'Not Applicable';
         end if;
