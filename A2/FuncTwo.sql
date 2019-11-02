@@ -1,4 +1,4 @@
-CREATE OR REPLACE queryTwo() RETURNS void as $$
+CREATE OR REPLACE FUNCTION queryTwo() RETURNS void as $$
 
 DECLARE 
     c1 cursor for select researcher_number, researcher_name, pi from Researchers;
