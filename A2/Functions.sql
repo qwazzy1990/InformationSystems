@@ -16,19 +16,23 @@ CREATE OR REPLACE FUNCTION findPI() RETURNS void as $$
 
 DECLARE 
     --check if the researcher is a pi and put their info into id, rname and isPi
-    c1 cursor for SELECT DISTINCT researcher_number, researcher_name, pi from Researchers;
+    c1 cursor for SELECT DISTINCT researcher_number, researcher_name, pi, project_id from Researchers;
+    c2 cursor for SELECT amount from Grants;
+    projId;
     id integer;
     rname varchar(100);
+    amnt integer;
     isPi boolean;
 BEGIN
     open c1;
     loop
-        fetch c1 into id, rname, isPi;
+        fetch c1 into id, rname, isPi, projId;
         exit when not found;
         if (isPi = true) then
             RAISE NOTICE 'ID: %', id;
             RAISE NOTICE 'Name: %', rname;
             RAISE NOTICE 'I do not like to share my income';
+            fetch c2 into amnt where Grants.project_id = projId; 
         else
             RAISE NOTICE 'Not Applicable';
         end if;
