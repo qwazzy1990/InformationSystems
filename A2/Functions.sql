@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION addNewProject(projectNumber integer,
 ) 
 RETURNS void as $$
 DECLARE
-    cursor c1 (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email, pi from Researchers where id = projectNumber;
+    c1 cursor (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email, pi from Researchers where id = projectNumber;
     researcherNumber integer;
     researcherName varchar(300);
     researcherPhone varchar(30);
@@ -69,6 +69,7 @@ BEGIN
     INSERT INTO Grants(grantNumber, amount, priod, fundingAgecny, projectNumber);
 
     open c1(id:=projectNumber);
+    close c1;
 
 END;
 
