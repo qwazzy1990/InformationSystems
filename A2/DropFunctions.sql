@@ -1,3 +1,3 @@
 
-DROP FUNCTION queryOne(integer);
-DROP FUNCTION queryTwo();
+DROP FUNCTION findReport(integer);
+DROP FUNCTION findPI();
