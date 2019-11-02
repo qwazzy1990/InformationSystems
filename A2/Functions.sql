@@ -32,7 +32,6 @@ BEGIN
             RAISE NOTICE 'ID: %', id;
             RAISE NOTICE 'Name: %', rname;
             open c2(id:=projId);
-            amnt  = amnt + fetch c2 into amnt;
             RAISE NOTICE 'Amount %', amnt;
             close c2;
 
@@ -42,6 +41,34 @@ BEGIN
         end if;
     end loop;
     close c1;
+
+END;
+
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION addNewProject(projectNumber integer,
+     projectName varchar(200), 
+    topicCode integer, 
+    piId integer, 
+    grantNumber integer, 
+    amount integer,
+    priod varchar(50),
+    fundingAgency varchar(50)
+) 
+RETURNS void as $$
+DECLARE
+    cursor c1 (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email, pi from Researchers where id = projectNumber;
+    researcherNumber integer;
+    researcherName varchar(300);
+    researcherPhone varchar(30);
+    researcherEmail varchar(100);
+    researcherRoom varchar(30);
+    researcherPi boolean;
+BEGIN
+    INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
+    INSERT INTO Grants(grantNumber, amount, priod, fundingAgecny, projectNumber);
+
+    open c1(projectNumber);
 
 END;
 
