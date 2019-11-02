@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION queryOne(val integer) RETURNS TABLE(rn int, 
     rname varchar(300), 
     phone varchar(30), 
-    room integer, 
+    room varchar(30), 
     email varchar(30),
     prid int,
     reportid int,
