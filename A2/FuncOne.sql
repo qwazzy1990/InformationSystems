@@ -1,4 +1,4 @@
-CREATE FUNCTION queryOne(val integer) RETURNS TABLE(rn int, 
+CREATE OR REPLACE FUNCTION queryOne(val integer) RETURNS TABLE(rn int, 
     rname varchar(300), 
     phone varchar(30), 
     room integer, 
