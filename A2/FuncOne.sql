@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION queryOne(val integer) RETURNS TABLE(rn int, 
-    title varchar(300),
+    tit varchar(300),
     topic int) AS $table1$
 BEGIN
     RETURN QUERY 
