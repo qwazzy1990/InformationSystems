@@ -68,7 +68,7 @@ BEGIN
     INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
     INSERT INTO Grants(grantNumber, amount, priod, fundingAgecny, projectNumber);
 
-    open c1(projectNumber);
+    open c1(id:=projectNumber);
 
 END;
 
