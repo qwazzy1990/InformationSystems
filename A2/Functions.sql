@@ -57,18 +57,27 @@ CREATE OR REPLACE FUNCTION Q3(projectNumber integer,
     fundingAgency varchar(50)
 ) 
 RETURNS void as $$
--- DECLARE
---     c1 cursor (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email, pi from Researchers where id = projectNumber;
---     researcherNumber integer;
---     researcherName varchar(300);
---     researcherPhone varchar(30);
---     researcherEmail varchar(100);
---     researcherRoom varchar(30);
---     researcherPi boolean;
+DECLARE
+     c1 cursor (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email from Researchers where id = projectNumber;
+     researcherNumber integer;
+     researcherName varchar(300);
+     researcherPhone varchar(30);
+     researcherEmail varchar(100);
+     researcherRoom varchar(30);
+
+     
 BEGIN
     INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
     INSERT INTO Grants VALUES(grantNumber, amount, priod, fundingAgency, projectNumber);
-
+    loop
+        fetch c1 into researcherNumber researcherName researcherPhone researcherEmail researcherRoom 
+        exit when not found
+        if (researcherNumber = piId) then 
+            insert into Reseachers values (researcherNumber, researcherName, researcherPhone, researcherEmail, projectNumber, projectNumber, NULL, true);
+            close c1 
+            exit 
+        end if;
+    end loop;
 
 END;
 
