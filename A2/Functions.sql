@@ -66,7 +66,7 @@ RETURNS void as $$
 --     researcherPi boolean;
 BEGIN
     INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
-    INSERT INTO Grants VALUES(grantNumber, amount, priod, fundingAgecny, projectNumber);
+    INSERT INTO Grants VALUES(grantNumber, amount, priod, fundingAgency, projectNumber);
 
 
 END;
