@@ -83,7 +83,7 @@ BEGIN
         fetch c1 into researcherNumber, researcherName, researcherPhone, researcherEmail, researcherRoom;
         exit when not found;
         if (researcherNumber = piId) then 
-            insert into Reseachers values (researcherNumber, researcherName, researcherPhone, researcherEmail, projectNumber, projectNumber, NULL, true);
+            insert into Researchers values (researcherNumber, researcherName, researcherPhone, researcherEmail, projectNumber, projectNumber, NULL, true);
             exit;
         end if;
     end loop;
