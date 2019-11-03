@@ -10,8 +10,12 @@ BEGIN
 END; $table1$
 LANGUAGE PLPGSQL;
 
+-- END FUNCTION Q1
+
 
 -- Function to find all the pis, display their name, id and amount of funding
+
+-- BEGIN FUNCTION Q2
 CREATE OR REPLACE FUNCTION Q2() RETURNS void as $$
 
 DECLARE 
@@ -47,6 +51,11 @@ END;
 
 $$ LANGUAGE PLPGSQL;
 
+-- END FUNCTION Q2
+
+
+-- BEGIN FUNCTION Q3
+
 CREATE OR REPLACE FUNCTION Q3(projectNumber integer,
      projectName varchar(200), 
     topicCode integer, 
@@ -58,7 +67,7 @@ CREATE OR REPLACE FUNCTION Q3(projectNumber integer,
 ) 
 RETURNS void as $$
 DECLARE
-     c1 cursor (id integer) for SELECT DISTINCT researcher_number, researcher_name, phone, room, email from Researchers where id = projectNumber;
+     c1 cursor for SELECT DISTINCT researcher_number, researcher_name, phone, room, email from Researchers;
      researcherNumber integer;
      researcherName varchar(300);
      researcherPhone varchar(30);
@@ -83,3 +92,5 @@ BEGIN
 END;
 
 $$ LANGUAGE PLPGSQL;
+
+-- END FUNCTION Q3
