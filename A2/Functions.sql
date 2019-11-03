@@ -67,6 +67,7 @@ DECLARE
 
      
 BEGIN
+    open c1;
     INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
     INSERT INTO Grants VALUES(grantNumber, amount, priod, fundingAgency, projectNumber);
     loop
@@ -74,10 +75,10 @@ BEGIN
         exit when not found;
         if (researcherNumber = piId) then 
             insert into Reseachers values (researcherNumber, researcherName, researcherPhone, researcherEmail, projectNumber, projectNumber, NULL, true);
-            close c1; 
             exit;
         end if;
     end loop;
+    close c1;
 
 END;
 
