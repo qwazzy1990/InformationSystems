@@ -83,7 +83,7 @@ BEGIN
         fetch c1 into researcherNumber, researcherName, researcherPhone, researcherRoom, researcherEmail;
         exit when not found;
         if (researcherNumber = piId) then 
-            insert into Researchers values (researcherNumber, researcherName, researcherPhone, researcherRoom, researcherEmail, projectNumber, 33, true);
+            insert into Researchers values (researcherNumber, researcherName, researcherPhone, researcherRoom, researcherEmail, projectNumber, topicCode, true);
             exit;
         end if;
     end loop;
@@ -94,3 +94,8 @@ END;
 $$ LANGUAGE PLPGSQL;
 
 -- END FUNCTION Q3
+
+-- BEGIN HELPER FUNCTION
+
+
+-- END HELER FUNCTIN
