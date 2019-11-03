@@ -80,10 +80,10 @@ BEGIN
     INSERT INTO Projects VALUES(projectNumber, projectName,topicCode);
     INSERT INTO Grants VALUES(grantNumber, amount, priod, fundingAgency, projectNumber);
     loop
-        fetch c1 into researcherNumber, researcherName, researcherPhone, researcherEmail, researcherRoom;
+        fetch c1 into researcherNumber, researcherName, researcherPhone, researcherRoom, researcherEmail;
         exit when not found;
         if (researcherNumber = piId) then 
-            insert into Researchers values (researcherNumber, researcherName, researcherPhone, researcherEmail, projectNumber, projectNumber, NULL, true);
+            insert into Researchers values (researcherNumber, researcherName, researcherPhone, researcherRoom, researcherEmail, projectNumber, 33, true);
             exit;
         end if;
     end loop;
