@@ -32,6 +32,7 @@ BEGIN
             RAISE NOTICE 'ID: %', id;
             RAISE NOTICE 'Name: %', rname;
             open c2(id:=projId);
+            fetch c2 into amnt;  
             RAISE NOTICE 'Amount %', amnt;
             close c2;
 
