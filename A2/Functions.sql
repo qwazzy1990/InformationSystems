@@ -1,6 +1,6 @@
 -- function for question 1
 
-CREATE OR REPLACE FUNCTION findReport(val integer) RETURNS TABLE(rn int, 
+CREATE OR REPLACE FUNCTION Q1(val integer) RETURNS TABLE(rn int, 
     tit varchar(300),
     topic int) AS $table1$
     -- returns a table that contains the report number, title and topic id of a report of a researcher if the researchers number is the same as val
@@ -12,7 +12,7 @@ LANGUAGE PLPGSQL;
 
 
 -- Function to find all the pis, display their name, id and amount of funding
-CREATE OR REPLACE FUNCTION findPI() RETURNS void as $$
+CREATE OR REPLACE FUNCTION Q2() RETURNS void as $$
 
 DECLARE 
     --check if the researcher is a pi and put their info into id, rname and isPi
@@ -46,7 +46,7 @@ END;
 
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION addNewProject(projectNumber integer,
+CREATE OR REPLACE FUNCTION Q3(projectNumber integer,
      projectName varchar(200), 
     topicCode integer, 
     piId integer, 
