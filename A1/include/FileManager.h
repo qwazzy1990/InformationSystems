@@ -31,6 +31,8 @@ bool deleteRecord(BTree t, char* key);
 
 int returnBlockNumber(char* key);
 
+int getBlockNumber(BTree t, char* key);
+
 StringArray readBlock(int fd, int offset);
 
 void addRecord(BTree t, char* key, char* value, int* fd);

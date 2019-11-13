@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
     printf("%s is loading, please wait\n", argv[1]);
     int fd;
 
-
     StringArray a = readFromFile(argv[1], &fd);
 
     if (a == NULL)
@@ -60,30 +59,39 @@ int main(int argc, char *argv[])
                 printf("Could not find record\n");
                 return 0;
             }
-            printf("%s\n", s);
-            free(key);
-            free(s);
+            if (strlen(s) == 0)
+            {
+                printf("Could not find record\n");
+            }
+            else
+            {
+                printf("%s\n", s);
+                free(key);
+                free(s);
+            }
 
             //search for using a key
         }
 
-        if(c == '2')
+        if (c == '2')
         {
             printf("Performing a range search in TreeData.txt\n");
-            char* k1 = calloc(100, sizeof(char));
-            char* k2 = calloc(100, sizeof(char));
+            char *k1 = calloc(100, sizeof(char));
+            char *k2 = calloc(100, sizeof(char));
             printf("Enter the first key\n");
             scanf("%s", k1);
             printf("Enter the second key\n");
             scanf("%s", k2);
 
-            char* s = rangeSearch(t, k1, k2);
+            char *s = rangeSearch(t, k1, k2);
             free(k1);
             free(k2);
-            if(s == NULL)
+            if (s == NULL)
             {
                 printf("The range searched failed\n");
-            }else{
+            }
+            else
+            {
                 printf("%s\n", s);
                 free(s);
             }
@@ -103,35 +111,11 @@ int main(int argc, char *argv[])
             strcpy(value, "  ");
             scanf("%s", value);
 
-            //get the block number that the key should go to
-            int blockNum = returnBlockNumber(key);
-            //the new key is xx. Contains user entered key plus its block number
-            char* xx = calloc(100, sizeof(char));
-            //strcat to xx the user entered key
-            strcat(xx, key);
-            //convert block num to a string and concantenate it to xx
-            char* temp = calloc(10, sizeof(char));
-            sprintf(temp, "%d", blockNum);
-            strcat(xx, temp);
-            //free the temp
-            free(temp);
-
-            //check if the new key, xx,  already exists
-            BNode n = findLeaf(t, xx);
-            
-            //if it already exists don't add it, plus err msg
-
-            if (n != NULL)
-            {
-                printf("The record already exists\n");
-            }
-            //else add the new key, xx, and the value
-            else
-            {
+          
                 int fd;
-                addRecord(t, xx, value, &fd);
+                addRecord(t, key, value, &fd);
 
-                char *s = findRecord(t, xx);
+                char *s = findRecord(t, key);
                 if (s == NULL)
                 {
                     printf("Error adding the key\n");
@@ -140,30 +124,31 @@ int main(int argc, char *argv[])
                 free(key);
                 free(value);
                 free(s);
-            }
+        
         }
 
-        if(c == '4')
+        if (c == '4')
         {
             printf("Deleting a record from TreeData.txt\n");
             printf("Enter the key to delete\n");
-            char* key = calloc(100, sizeof(char));
+            char *key = calloc(100, sizeof(char));
             scanf("%s", key);
-            char* record = findRecord(t, key);
-            if(record == NULL)
+            char *record = findRecord(t, key);
+            if (record == NULL)
             {
                 printf("The record does not exist\n");
                 free(key);
-            }else{
+            }
+            else
+            {
                 printf("Successfully deleted record\n");
                 deleteRecord(t, key);
                 free(key);
                 free(record);
             }
-
         }
 
-        if(c == '5')
+        if (c == '5')
         {
             printf("Printing all the records in TreeData.txt\n");
             print_tree(t, t->root);

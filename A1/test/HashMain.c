@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
             else
             {
                 Record r;
+                printf("hash is %ld\n", hash(m, key)*RECORD_SIZE);
                 readRecordHash(hash(m, key) * RECORD_SIZE, &r);
                 printf("Found the record\n%s %s\n", r.key, r.value);
             }

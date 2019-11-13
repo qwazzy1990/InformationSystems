@@ -263,14 +263,14 @@ BNode readNode(char *fileName, int idx)
 
     int num = 0;
     read(fd, &num, sizeof(int));
-    printf("been added is %d\n", num);
+    //printf("been added is %d\n", num);
     if (num == 0)
         n->beenAdded = false;
     else
         n->beenAdded = true;
 
     read(fd, &num, sizeof(int));
-    printf("been deleted is %d\n", num);
+    //printf("been deleted is %d\n", num);
     if (num == 0)
         n->deleted = false;
     else
@@ -331,7 +331,7 @@ char *findRecord(BTree t, char *key)
             {
                 idx--;
             }
-            idx++;
+            //idx++;
 
             //if key equals the curNode's key minus the block number then you found the key.
             if (strncmp(key, curNode->keys[i], idx) == 0)
@@ -370,6 +370,7 @@ char *findRecord(BTree t, char *key)
                     //get the shit
                     char *shit = calloc(1000, sizeof(char));
                     strcat(shit, a->strings[x]);
+                    strcat(shit, " ");
                     strcat(shit, a->strings[x + 1]);
 
                     //set the record to the shity
@@ -497,6 +498,8 @@ int returnBlockNumber(char *key)
     return bn;
 }
 
+
+
 void addRecord(BTree t, char *key, char *value, int *fd)
 {
     *fd = open("TreeData.txt", O_RDONLY);
@@ -514,12 +517,11 @@ void addRecord(BTree t, char *key, char *value, int *fd)
     lseek(*fd, 0, SEEK_SET);
 
     //for each block, check to see if the key goes at that block number
-    printf("Num blocks is %d\n", numBlocks);
+    //printf("Num blocks is %d\n", numBlocks);
     forall(numBlocks + 1)
     {
 
         StringArray sa = readBlock(*fd, x * BLOCK_SIZE + 4);
-        printf("Sa size is %d\n", sa->size);
 
         if (sa->size % 2 == 1)
         {
@@ -531,9 +533,12 @@ void addRecord(BTree t, char *key, char *value, int *fd)
         if (x == 0 && strcmp(key, sa->strings[0]) < 0)
         {
             close(*fd);
-            printf("Match found\n");
+            printf("Match found 1\n");
             *fd = open("TreeData.txt", O_WRONLY);
-
+            new_object(char*, ss, 100);
+            sprintf(ss, "%d", x);
+            strcat(key, ss);
+            free(ss);
             // add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
@@ -563,13 +568,16 @@ void addRecord(BTree t, char *key, char *value, int *fd)
             break;
         }
         //printf("sa size is %d\n", sa->size);
-        printf("key first key last key %s %s %s\n", key, sa->strings[0], sa->strings[sa->size - 2]);
         if (strcmp(sa->strings[0], key) <= 0 && (strcmp(sa->strings[sa->size - 2], key) >= 0))
         {
             close(*fd);
-            printf("Match found\n");
+            printf("Match found 2\n");
             *fd = open("TreeData.txt", O_WRONLY);
-
+            printf("check 1 key is %s\n", key);
+            new_object(char*, ss, 100);
+            sprintf(ss, "%d", x);
+            strcat(key, ss);
+            free(ss);
             // add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
@@ -602,9 +610,12 @@ void addRecord(BTree t, char *key, char *value, int *fd)
         if (x == numBlocks)
         {
             close(*fd);
-            printf("Match found\n");
+            printf("Match found 3\n");
             *fd = open("TreeData.txt", O_WRONLY);
-
+            new_object(char*, ss, 100);
+            sprintf(ss, "%d", x);
+            strcat(key, ss);
+            free(ss);
             // add the new key and value to the block
             addStringArray(sa, key);
             addStringArray(sa, value);
